@@ -1,4 +1,11 @@
 package nl.novi.plantenkennis.repository;
 
-public class PlantSoortRepository {
+import nl.novi.plantenkennis.entity.PlantSoort;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+
+public interface PlantSoortRepository extends JpaRepository<PlantSoort, Long> {
+    Optional<PlantSoort> findByNaamIgnoreCase(String naam);
+    boolean existsByNaamIgnoreCase(String naam);
 }
