@@ -1,6 +1,10 @@
 package nl.novi.plantenkennis.controller;
 
+import jakarta.validation.Valid;
+import nl.novi.plantenkennis.dto.PlantSoortRequestDto;
+import nl.novi.plantenkennis.dto.PlantSoortResponseDto;
 import nl.novi.plantenkennis.entity.PlantSoort;
+import nl.novi.plantenkennis.mapper.PlantSoortMapper;
 import nl.novi.plantenkennis.service.PlantSoortService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,13 +23,22 @@ public class PlantSoortController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PlantSoort>> getAll() {
-        return ResponseEntity.ok(service.getAll());
+    public ResponseEntity<List<PlantSoortResponseDto>> getAll() {
+        List<PlantSoortResponseDto> response = service.getAll().stream()
+                .map(PlantSoortMapper::toResponse)
+                .toList();
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
-    public ResponseEntity<PlantSoort> create(@RequestBody PlantSoort plantSoort) {
-        PlantSoort created = service.create(plantSoort);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    public ResponseEntity<PlantSoortResponseDto> create(
+            @Valid @RequestBody PlantSoortRequestDto dto) {
+
+        PlantSoort created = service.create(PlantSoortMapper.toEntity(dto));
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(PlantSoortMapper.toResponse(created));
     }
 }
