@@ -31,6 +31,12 @@ public class PlantSoortController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<PlantSoortResponseDto> getById(@PathVariable Long id) {
+        PlantSoort plantSoort = service.getById(id);
+        return ResponseEntity.ok(PlantSoortMapper.toResponse(plantSoort));
+    }
+
     @PostMapping
     public ResponseEntity<PlantSoortResponseDto> create(
             @Valid @RequestBody PlantSoortRequestDto dto) {
