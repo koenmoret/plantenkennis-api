@@ -22,7 +22,7 @@ public class PlantSoortController {
         this.service = service;
     }
 
-    @GetMapping
+    @GetMapping({"", "/"})
     public ResponseEntity<List<PlantSoortResponseDto>> getAll() {
         List<PlantSoortResponseDto> response = service.getAll().stream()
                 .map(PlantSoortMapper::toResponse)
