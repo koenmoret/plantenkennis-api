@@ -3,6 +3,8 @@ package nl.novi.plantenkennis.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.time.LocalDateTime;
 
 @Entity
@@ -44,4 +46,7 @@ public class PlantSoort {
     private String slug;
 
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "plantSoort", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Foto> fotos = new ArrayList<>();
 }
