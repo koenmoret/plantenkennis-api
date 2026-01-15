@@ -2,6 +2,7 @@ package nl.novi.plantenkennis.service;
 
 import nl.novi.plantenkennis.entity.PlantSoort;
 import nl.novi.plantenkennis.repository.PlantSoortRepository;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -47,6 +48,7 @@ class PlantSoortServiceTest {
      * - De repository retourneert twee PlantSoort objecten
      * - De service geeft deze lijst ongewijzigd terug
      */
+    @DisplayName("Geeft alle plantsoorten terug wanneer deze bestaan")
     @Test
     void getAll_happyFlow_returnsListOfPlantSoorten() {
         // Arrange: maak voorbeelddata aan
@@ -86,6 +88,7 @@ class PlantSoortServiceTest {
      * - De repository retourneert een PlantSoort
      * - De service geeft dit object correct terug
      */
+    @DisplayName("Geeft één plantsoort terug op basis van id")
     @Test
     void getById_happyFlow_returnsPlantSoort() {
         // Arrange: maak een voorbeeld PlantSoort aan
