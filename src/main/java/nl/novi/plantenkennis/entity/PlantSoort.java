@@ -24,4 +24,7 @@ public class PlantSoort {
 
     @Column(length = 2000)
     private String omschrijving;
+
+    @Column(nullable = false, length = 50)
+    private String soort;
 }
