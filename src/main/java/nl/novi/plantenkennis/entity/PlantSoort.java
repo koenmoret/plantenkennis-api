@@ -3,8 +3,10 @@ package nl.novi.plantenkennis.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
-@Table(name = "plant_soorten")
+@Table(name = "plant_soort")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,15 +18,30 @@ public class PlantSoort {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 120)
-    private String naam;
+    @Column(name = "wetenschappelijke_naam")
+    private String wetenschappelijkeNaam;
 
-    @Column(length = 120)
-    private String latijnseNaam;
+    @Column(name = "nederlandse_naam", nullable = false, unique = true)
+    private String nederlandseNaam;
+
+    private String familie;
 
     @Column(length = 2000)
-    private String omschrijving;
+    private String beschrijving;
 
-    @Column(nullable = false, length = 50)
-    private String soort;
+    private Integer bloeiperiodeStart;
+
+    private Integer bloeiperiodeEinde;
+
+    private Boolean giftig;
+
+    private Boolean inheems;
+
+    @Column(length = 50)
+    private String onderhoudsniveau;
+
+    @Column(length = 120)
+    private String slug;
+
+    private LocalDateTime updatedAt;
 }

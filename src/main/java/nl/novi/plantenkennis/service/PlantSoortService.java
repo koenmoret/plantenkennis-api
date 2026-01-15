@@ -1,12 +1,12 @@
 package nl.novi.plantenkennis.service;
 
 import nl.novi.plantenkennis.entity.PlantSoort;
+import nl.novi.plantenkennis.exception.DuplicateResourceException;
+import nl.novi.plantenkennis.exception.ResourceNotFoundException;
 import nl.novi.plantenkennis.repository.PlantSoortRepository;
 import org.springframework.stereotype.Service;
 
-import nl.novi.plantenkennis.exception.DuplicateResourceException;
-import nl.novi.plantenkennis.exception.ResourceNotFoundException;
-
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -28,9 +28,13 @@ public class PlantSoortService {
     }
 
     public PlantSoort create(PlantSoort plantSoort) {
-        if (repository.existsByNaamIgnoreCase(plantSoort.getNaam())) {
-            throw new DuplicateResourceException("PlantSoort bestaat al: " + plantSoort.getNaam());
+        if (repository.existsByNederlandseNaamIgnoreCase(plantSoort.getNederlandseNaam())) {
+            throw new DuplicateResourceException("PlantSoort bestaat al: " + plantSoort.getNederlandseNaam());
         }
+
+        // updatedAt hoort server-side gezet te worden
+        plantSoort.setUpdatedAt(LocalDateTime.now());
+
         return repository.save(plantSoort);
     }
 }
