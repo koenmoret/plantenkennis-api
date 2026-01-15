@@ -6,6 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface PlantSoortRepository extends JpaRepository<PlantSoort, Long> {
-    Optional<PlantSoort> findByNaamIgnoreCase(String naam);
-    boolean existsByNaamIgnoreCase(String naam);
+    boolean existsByNederlandseNaamIgnoreCase(String nederlandseNaam);
 }
