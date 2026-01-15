@@ -10,6 +10,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -75,5 +77,25 @@ class FavorietServiceTest {
 
         verify(repository).existsByGebruikerIdAndPlantSoortId(1L, 2L);
         verify(repository, never()).save(any(Favoriet.class));
+    }
+
+    @DisplayName("getByGebruikerId() geeft lijst van favorieten terug")
+    @Test
+    void getByGebruikerId_returnsList() {
+        // Arrange
+        Favoriet f1 = Favoriet.builder().id(1L).gebruikerId(1L).plantSoortId(10L).build();
+        Favoriet f2 = Favoriet.builder().id(2L).gebruikerId(1L).plantSoortId(11L).build();
+
+        when(repository.findByGebruikerId(1L)).thenReturn(List.of(f1, f2));
+
+        // Act
+        List<Favoriet> result = service.getByGebruikerId(1L);
+
+        // Assert
+        assertEquals(2, result.size());
+        assertEquals(10L, result.get(0).getPlantSoortId());
+        assertEquals(11L, result.get(1).getPlantSoortId());
+
+        verify(repository).findByGebruikerId(1L);
     }
 }
