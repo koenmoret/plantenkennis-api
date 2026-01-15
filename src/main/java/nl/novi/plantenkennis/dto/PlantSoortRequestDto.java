@@ -1,19 +1,22 @@
 package nl.novi.plantenkennis.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class PlantSoortRequestDto {
 
-    @NotBlank
-    @Size(max = 120)
-    private String naam;
+    private String wetenschappelijkeNaam;
+    private String nederlandseNaam;
+    private String familie;
+    private String beschrijving;
 
-    @Size(max = 120)
-    private String latijnseNaam;
+    private Integer bloeiperiodeStart;
+    private Integer bloeiperiodeEinde;
 
-    @Size(max = 2000)
-    private String omschrijving;
+    private Boolean giftig;
+    private Boolean inheems;
+
+    private String onderhoudsniveau;
 }
