@@ -1,6 +1,8 @@
 package nl.novi.plantenkennis.service;
 
 import nl.novi.plantenkennis.entity.PlantSoort;
+import nl.novi.plantenkennis.exception.DuplicateResourceException;
+import nl.novi.plantenkennis.exception.ResourceNotFoundException;
 import nl.novi.plantenkennis.repository.PlantSoortRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,10 +14,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests voor {@link PlantSoortService}.
@@ -27,31 +27,16 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class PlantSoortServiceTest {
 
-    /**
-     * Mock van de repository.
-     * Hiermee simuleren we databasegedrag zonder echte database.
-     */
     @Mock
     private PlantSoortRepository repository;
 
-    /**
-     * De service die we testen.
-     * Mockito injecteert automatisch de gemockte repository.
-     */
     @InjectMocks
     private PlantSoortService service;
 
-    /**
-     * Test het happy flow scenario van getAll().
-     *
-     * Verwachting:
-     * - De repository retourneert twee PlantSoort objecten
-     * - De service geeft deze lijst ongewijzigd terug
-     */
     @DisplayName("Geeft alle plantsoorten terug wanneer deze bestaan")
     @Test
     void getAll_happyFlow_returnsListOfPlantSoorten() {
-        // Arrange: maak voorbeelddata aan
+        // Arrange
         PlantSoort tulp = PlantSoort.builder()
                 .id(1L)
                 .naam("Tulp")
@@ -66,32 +51,22 @@ class PlantSoortServiceTest {
                 .omschrijving("Nog een voorbeeld")
                 .build();
 
-        // Simuleer repositorygedrag
         when(repository.findAll()).thenReturn(List.of(tulp, roos));
 
-        // Act: roep de service-methode aan
+        // Act
         List<PlantSoort> result = service.getAll();
 
-        // Assert: controleer resultaat
+        // Assert
         assertEquals(2, result.size());
         assertEquals("Tulp", result.get(0).getNaam());
         assertEquals("Roos", result.get(1).getNaam());
-
-        // Verifieer dat de repository daadwerkelijk is aangeroepen
         verify(repository).findAll();
     }
 
-    /**
-     * Test het happy flow scenario van getById().
-     *
-     * Verwachting:
-     * - De repository retourneert een PlantSoort
-     * - De service geeft dit object correct terug
-     */
-    @DisplayName("Geeft één plantsoort terug op basis van id")
+    @DisplayName("Geeft één plantsoort terug op basis van id wanneer deze bestaat")
     @Test
     void getById_happyFlow_returnsPlantSoort() {
-        // Arrange: maak een voorbeeld PlantSoort aan
+        // Arrange
         PlantSoort tulp = PlantSoort.builder()
                 .id(1L)
                 .naam("Tulp")
@@ -99,18 +74,88 @@ class PlantSoortServiceTest {
                 .omschrijving("Voorbeeld plantsoort")
                 .build();
 
-        // Simuleer repositorygedrag
         when(repository.findById(1L)).thenReturn(Optional.of(tulp));
 
-        // Act: roep de service-methode aan
+        // Act
         PlantSoort result = service.getById(1L);
 
-        // Assert: controleer of het object correct is teruggegeven
+        // Assert
         assertNotNull(result);
         assertEquals(1L, result.getId());
         assertEquals("Tulp", result.getNaam());
-
-        // Verifieer correcte repository-aanroep
         verify(repository).findById(1L);
+    }
+
+    @DisplayName("Gooi ResourceNotFoundException wanneer plantsoort niet bestaat")
+    @Test
+    void getById_notFound_throwsResourceNotFoundException() {
+        // Arrange
+        when(repository.findById(99L)).thenReturn(Optional.empty());
+
+        // Act + Assert
+        ResourceNotFoundException ex = assertThrows(
+                ResourceNotFoundException.class,
+                () -> service.getById(99L)
+        );
+
+        assertTrue(ex.getMessage().contains("PlantSoort niet gevonden"));
+        verify(repository).findById(99L);
+    }
+
+    @DisplayName("Slaat plantsoort op wanneer naam nog niet bestaat")
+    @Test
+    void create_happyFlow_savesPlantSoort() {
+        // Arrange
+        PlantSoort nieuw = PlantSoort.builder()
+                .naam("Lavendel")
+                .latijnseNaam("Lavandula")
+                .omschrijving("Paarse plant")
+                .build();
+
+        when(repository.existsByNaamIgnoreCase("Lavendel")).thenReturn(false);
+
+        PlantSoort saved = PlantSoort.builder()
+                .id(10L)
+                .naam("Lavendel")
+                .latijnseNaam("Lavandula")
+                .omschrijving("Paarse plant")
+                .build();
+
+        when(repository.save(nieuw)).thenReturn(saved);
+
+        // Act
+        PlantSoort result = service.create(nieuw);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(10L, result.getId());
+        assertEquals("Lavendel", result.getNaam());
+
+        verify(repository).existsByNaamIgnoreCase("Lavendel");
+        verify(repository).save(nieuw);
+    }
+
+    @DisplayName("Gooi DuplicateResourceException wanneer plantsoortnaam al bestaat")
+    @Test
+    void create_duplicate_throwsDuplicateResourceException() {
+        // Arrange
+        PlantSoort dup = PlantSoort.builder()
+                .naam("Tulp")
+                .latijnseNaam("Tulipa")
+                .omschrijving("Dubbel")
+                .build();
+
+        when(repository.existsByNaamIgnoreCase("Tulp")).thenReturn(true);
+
+        // Act + Assert
+        DuplicateResourceException ex = assertThrows(
+                DuplicateResourceException.class,
+                () -> service.create(dup)
+        );
+
+        assertTrue(ex.getMessage().contains("PlantSoort bestaat al"));
+
+        verify(repository).existsByNaamIgnoreCase("Tulp");
+        verify(repository, never()).save(any(PlantSoort.class));
     }
 }
