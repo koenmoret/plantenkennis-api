@@ -37,8 +37,10 @@ public class PlantSoort {
 
     private Boolean inheems;
 
+    @Column(length = 50)
     private String onderhoudsniveau;
 
+    @Column(length = 120)
     private String slug;
 
     private LocalDateTime updatedAt;
