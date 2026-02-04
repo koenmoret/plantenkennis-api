@@ -6,6 +6,7 @@ import nl.novi.plantenkennis.exception.ResourceNotFoundException;
 import nl.novi.plantenkennis.repository.KenmerkRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -18,7 +19,12 @@ public class KenmerkService {
     }
 
     public List<Kenmerk> getAll() {
-        return repository.findAll();
+        // Optioneel: nette vaste sortering (makkelijker testen/UI)
+        return repository.findAll()
+                .stream()
+                .sorted(Comparator.comparing(Kenmerk::getType, String.CASE_INSENSITIVE_ORDER)
+                        .thenComparing(Kenmerk::getWaarde, String.CASE_INSENSITIVE_ORDER))
+                .toList();
     }
 
     public Kenmerk getById(Long id) {
@@ -27,6 +33,7 @@ public class KenmerkService {
     }
 
     public Kenmerk create(Kenmerk kenmerk) {
+        // Optie A: type/waarde zijn niet blank door DTO-validatie, maar normalisatie blijft goed
         kenmerk.setType(kenmerk.getType().trim());
         kenmerk.setWaarde(kenmerk.getWaarde().trim());
 

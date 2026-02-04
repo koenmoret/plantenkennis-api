@@ -1,7 +1,7 @@
 package nl.novi.plantenkennis.dto;
 
-import lombok.*;
 import jakarta.validation.constraints.NotBlank;
+import lombok.*;
 
 @Getter
 @Setter
@@ -10,9 +10,9 @@ import jakarta.validation.constraints.NotBlank;
 @AllArgsConstructor
 public class KenmerkRequestDto {
 
-    @NotBlank
+    @NotBlank(message = "Type is verplicht")
     private String type;
 
-    @NotBlank
+    @NotBlank(message = "Waarde is verplicht")
     private String waarde;
 }
