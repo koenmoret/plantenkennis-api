@@ -7,6 +7,7 @@ import nl.novi.plantenkennis.mapper.KenmerkMapper;
 import nl.novi.plantenkennis.service.KenmerkService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -36,7 +37,7 @@ public class KenmerkController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public KenmerkResponseDto create(@RequestBody KenmerkRequestDto dto) {
+    public KenmerkResponseDto create(@Valid @RequestBody KenmerkRequestDto dto) {
         Kenmerk kenmerk = KenmerkMapper.toEntity(dto);
         Kenmerk created = service.create(kenmerk);
         return KenmerkMapper.toResponse(created);

@@ -7,6 +7,8 @@ import nl.novi.plantenkennis.entity.Kenmerk;
 public class KenmerkMapper {
 
     public static Kenmerk toEntity(KenmerkRequestDto dto) {
+        if (dto == null) return null;
+
         return Kenmerk.builder()
                 .type(dto.getType())
                 .waarde(dto.getWaarde())

@@ -27,6 +27,9 @@ public class KenmerkService {
     }
 
     public Kenmerk create(Kenmerk kenmerk) {
+        kenmerk.setType(kenmerk.getType().trim());
+        kenmerk.setWaarde(kenmerk.getWaarde().trim());
+
         boolean bestaatAl = repository.existsByTypeIgnoreCaseAndWaardeIgnoreCase(
                 kenmerk.getType(),
                 kenmerk.getWaarde()
