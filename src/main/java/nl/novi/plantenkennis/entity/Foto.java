@@ -25,7 +25,8 @@ public class Foto {
     @Column(name = "alt_tekst")
     private String altTekst;
 
-    private Boolean hoofdfoto;
+    @Column(nullable = false)
+    private boolean hoofdfoto;
 
     private String bron;
 
