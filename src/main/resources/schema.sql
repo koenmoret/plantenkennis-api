@@ -78,6 +78,15 @@ CREATE TABLE foto (
                               ON DELETE CASCADE
 );
 
+-- Snellere lookups: alle foto's van een plant
+CREATE INDEX ix_foto_plant_soort_id
+    ON foto (plant_soort_id);
+
+-- Per plant maximaal 1 hoofdfoto (PostgreSQL partial unique index)
+CREATE UNIQUE INDEX ux_foto_hoofdfoto_per_plant
+    ON foto (plant_soort_id)
+    WHERE hoofdfoto = TRUE;
+
 -- =========================================
 -- 4) Synoniem (compositie bij PlantSoort)
 -- =========================================

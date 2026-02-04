@@ -15,7 +15,7 @@ public class FotoMapper {
                 .fotograaf(dto.getFotograaf())
                 .licentie(dto.getLicentie())
                 .altTekst(dto.getAltTekst())
-                .hoofdfoto(dto.getHoofdfoto())
+                .hoofdfoto(Boolean.TRUE.equals(dto.getHoofdfoto()))
                 .bron(dto.getBron())
                 .plantSoort(plantSoort)
                 .build();
@@ -30,7 +30,7 @@ public class FotoMapper {
                 .fotograaf(entity.getFotograaf())
                 .licentie(entity.getLicentie())
                 .altTekst(entity.getAltTekst())
-                .hoofdfoto(entity.getHoofdfoto())
+                .hoofdfoto(entity.isHoofdfoto())
                 .bron(entity.getBron())
                 .build();
     }

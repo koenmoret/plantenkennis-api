@@ -28,7 +28,17 @@ public class FotoService {
         PlantSoort plant = plantSoortRepository.findById(plantSoortId)
                 .orElseThrow(() -> new ResourceNotFoundException("PlantSoort niet gevonden: " + plantSoortId));
 
+        // Als deze foto hoofdfoto wordt: zet bestaande hoofdfoto uit
+        if (foto.isHoofdfoto()) {
+            fotoRepository.findFirstByPlantSoortIdAndHoofdfotoTrue(plantSoortId)
+                    .ifPresent(bestaande -> {
+                        bestaande.setHoofdfoto(false);
+                        fotoRepository.save(bestaande);
+                    });
+        }
+
         foto.setPlantSoort(plant);
         return fotoRepository.save(foto);
     }
+
 }
