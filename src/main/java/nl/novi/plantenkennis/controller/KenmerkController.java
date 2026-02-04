@@ -1,5 +1,6 @@
 package nl.novi.plantenkennis.controller;
 
+import jakarta.validation.Valid;
 import nl.novi.plantenkennis.dto.KenmerkRequestDto;
 import nl.novi.plantenkennis.dto.KenmerkResponseDto;
 import nl.novi.plantenkennis.entity.Kenmerk;
@@ -7,7 +8,6 @@ import nl.novi.plantenkennis.mapper.KenmerkMapper;
 import nl.novi.plantenkennis.service.KenmerkService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -21,7 +21,7 @@ public class KenmerkController {
         this.service = service;
     }
 
-    @GetMapping({"", "/"})
+    @GetMapping
     public List<KenmerkResponseDto> getAll() {
         return service.getAll()
                 .stream()
