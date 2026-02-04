@@ -35,9 +35,11 @@ public class PlantSoort {
 
     private Integer bloeiperiodeEinde;
 
-    private Boolean giftig;
+    @Column(nullable = false)
+    private boolean giftig;
 
-    private Boolean inheems;
+    @Column(nullable = false)
+    private boolean inheems;
 
     @Column(length = 50)
     private String onderhoudsniveau;
@@ -49,4 +51,7 @@ public class PlantSoort {
 
     @OneToMany(mappedBy = "plantSoort", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Foto> fotos = new ArrayList<>();
+
+    @OneToMany(mappedBy = "plantSoort", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PlantKenmerk> plantKenmerken = new ArrayList<>();
 }
