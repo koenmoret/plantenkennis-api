@@ -56,8 +56,8 @@ public class PlantSoortController {
 
     @GetMapping("/{plantSoortId}/kenmerken")
     public ResponseEntity<List<KenmerkResponseDto>> getKenmerken(@PathVariable Long plantSoortId) {
-        List<KenmerkResponseDto> response = plantKenmerkService.getByPlantSoort(plantSoortId).stream()
-                .map(pk -> KenmerkMapper.toResponse(pk.getKenmerk()))
+        List<KenmerkResponseDto> response = plantKenmerkService.getKenmerkenVoorPlant(plantSoortId).stream()
+                .map(KenmerkMapper::toResponse)
                 .toList();
 
         return ResponseEntity.ok(response);

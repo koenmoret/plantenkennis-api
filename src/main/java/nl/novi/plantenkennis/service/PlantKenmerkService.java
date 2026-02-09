@@ -35,6 +35,13 @@ public class PlantKenmerkService {
         return plantKenmerkRepository.findByPlantSoortId(plantSoortId);
     }
 
+    public List<Kenmerk> getKenmerkenVoorPlant(Long plantSoortId) {
+        if (!plantSoortRepository.existsById(plantSoortId)) {
+            throw new ResourceNotFoundException("PlantSoort niet gevonden: " + plantSoortId);
+        }
+        return plantKenmerkRepository.findKenmerkenByPlantSoortId(plantSoortId);
+    }
+
     public PlantKenmerk addKenmerkToPlant(Long plantSoortId, Long kenmerkId) {
         PlantSoort plant = plantSoortRepository.findById(plantSoortId)
                 .orElseThrow(() -> new ResourceNotFoundException("PlantSoort niet gevonden: " + plantSoortId));
