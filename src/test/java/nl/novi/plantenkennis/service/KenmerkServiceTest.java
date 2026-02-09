@@ -30,8 +30,18 @@ class KenmerkServiceTest {
     @Test
     void getAll_returnsList() {
         // Arrange
-        Kenmerk k1 = Kenmerk.builder().id(1L).type("bloemkleur").waarde("paars").build();
-        Kenmerk k2 = Kenmerk.builder().id(2L).type("bladtype").waarde("ovaal").build();
+        Kenmerk k1 = Kenmerk.builder()
+                .id(1L)
+                .type("bloemkleur")
+                .waarde("paars")
+                .build();
+
+        Kenmerk k2 = Kenmerk.builder()
+                .id(2L)
+                .type("bladtype")
+                .waarde("ovaal")
+                .build();
+
         when(repository.findAll()).thenReturn(List.of(k1, k2));
 
         // Act
@@ -39,10 +49,16 @@ class KenmerkServiceTest {
 
         // Assert
         assertEquals(2, result.size());
-        assertEquals("bloemkleur", result.get(0).getType());
-        assertEquals("bladtype", result.get(1).getType());
+
+        assertTrue(result.stream()
+                .anyMatch(k -> k.getType().equals("bloemkleur") && k.getWaarde().equals("paars")));
+
+        assertTrue(result.stream()
+                .anyMatch(k -> k.getType().equals("bladtype") && k.getWaarde().equals("ovaal")));
+
         verify(repository).findAll();
     }
+
 
     @DisplayName("getById() retourneert kenmerk wanneer gevonden")
     @Test
