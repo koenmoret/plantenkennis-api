@@ -1,7 +1,15 @@
 -- =========================================
+-- data.sql - Seed data voor Plantenkennis API
+-- =========================================
+
+-- =========================================
 -- 0) Opschonen (volgorde i.v.m. FK’s)
 -- =========================================
+DELETE FROM favoriet;
+DELETE FROM spelsessie;
 DELETE FROM plantkenmerk;
+DELETE FROM foto;
+DELETE FROM synoniem;
 DELETE FROM kenmerk;
 DELETE FROM plant_soort;
 
@@ -81,34 +89,140 @@ INSERT INTO kenmerk (type, waarde) VALUES
                                        ('WATERBEHOEFTE', 'HOOG');
 
 -- =========================================
--- 3) Koppelingen Plant ↔ Kenmerk
+-- 3) Koppelingen Plant ↔ Kenmerk (ruimer voor testen)
 -- (subselects op naam → stabiel)
 -- =========================================
 INSERT INTO plantkenmerk (plant_soort_id, kenmerk_id)
 SELECT ps.id, k.id
-FROM plant_soort ps, kenmerk k
+FROM plant_soort ps
+         JOIN kenmerk k ON 1=1
 WHERE
-    (
-        ps.nederlandse_naam = 'Lavendel'
-            AND k.type = 'BLOEMKLEUR' AND k.waarde = 'PAARS'
-        )
-   OR (
-    ps.nederlandse_naam = 'Lavendel'
-        AND k.type = 'STANDPLAATS' AND k.waarde = 'ZON'
-    )
-   OR (
-    ps.nederlandse_naam = 'Basilicum'
-        AND k.type = 'WATERBEHOEFTE' AND k.waarde = 'HOOG'
-    )
-   OR (
-    ps.nederlandse_naam = 'Zonnebloem'
-        AND k.type = 'STANDPLAATS' AND k.waarde = 'ZON'
-    )
-   OR (
-    ps.nederlandse_naam = 'Narcis'
-        AND k.type = 'BLOEMKLEUR' AND k.waarde = 'GEEL'
-    )
-   OR (
-    ps.nederlandse_naam = 'Beuk'
-        AND k.type = 'STANDPLAATS' AND k.waarde = 'HALFSCHADUW'
-    );
+   -- Lavendel: paars, zon, laag water
+    (ps.nederlandse_naam = 'Lavendel' AND k.type = 'BLOEMKLEUR' AND k.waarde = 'PAARS')
+   OR (ps.nederlandse_naam = 'Lavendel' AND k.type = 'STANDPLAATS' AND k.waarde = 'ZON')
+   OR (ps.nederlandse_naam = 'Lavendel' AND k.type = 'WATERBEHOEFTE' AND k.waarde = 'LAAG')
+
+   -- Hondsroos: rood, zon/halfschaduw, gemiddeld water
+   OR (ps.nederlandse_naam = 'Hondsroos' AND k.type = 'BLOEMKLEUR' AND k.waarde = 'ROOD')
+   OR (ps.nederlandse_naam = 'Hondsroos' AND k.type = 'STANDPLAATS' AND k.waarde = 'HALFSCHADUW')
+   OR (ps.nederlandse_naam = 'Hondsroos' AND k.type = 'WATERBEHOEFTE' AND k.waarde = 'GEMIDDELD')
+
+   -- Boerenhortensia: wit, schaduw/halfschaduw, hoog water
+   OR (ps.nederlandse_naam = 'Boerenhortensia' AND k.type = 'BLOEMKLEUR' AND k.waarde = 'WIT')
+   OR (ps.nederlandse_naam = 'Boerenhortensia' AND k.type = 'STANDPLAATS' AND k.waarde = 'SCHADUW')
+   OR (ps.nederlandse_naam = 'Boerenhortensia' AND k.type = 'WATERBEHOEFTE' AND k.waarde = 'HOOG')
+
+   -- Tulp: rood, zon, gemiddeld water
+   OR (ps.nederlandse_naam = 'Tulp' AND k.type = 'BLOEMKLEUR' AND k.waarde = 'ROOD')
+   OR (ps.nederlandse_naam = 'Tulp' AND k.type = 'STANDPLAATS' AND k.waarde = 'ZON')
+   OR (ps.nederlandse_naam = 'Tulp' AND k.type = 'WATERBEHOEFTE' AND k.waarde = 'GEMIDDELD')
+
+   -- Narcis: geel, zon/halfschaduw, laag water
+   OR (ps.nederlandse_naam = 'Narcis' AND k.type = 'BLOEMKLEUR' AND k.waarde = 'GEEL')
+   OR (ps.nederlandse_naam = 'Narcis' AND k.type = 'STANDPLAATS' AND k.waarde = 'HALFSCHADUW')
+   OR (ps.nederlandse_naam = 'Narcis' AND k.type = 'WATERBEHOEFTE' AND k.waarde = 'LAAG')
+
+   -- Zonnebloem: geel, zon, hoog water
+   OR (ps.nederlandse_naam = 'Zonnebloem' AND k.type = 'BLOEMKLEUR' AND k.waarde = 'GEEL')
+   OR (ps.nederlandse_naam = 'Zonnebloem' AND k.type = 'STANDPLAATS' AND k.waarde = 'ZON')
+   OR (ps.nederlandse_naam = 'Zonnebloem' AND k.type = 'WATERBEHOEFTE' AND k.waarde = 'HOOG')
+
+   -- Basilicum: wit (bloemetjes), zon, hoog water
+   OR (ps.nederlandse_naam = 'Basilicum' AND k.type = 'BLOEMKLEUR' AND k.waarde = 'WIT')
+   OR (ps.nederlandse_naam = 'Basilicum' AND k.type = 'STANDPLAATS' AND k.waarde = 'ZON')
+   OR (ps.nederlandse_naam = 'Basilicum' AND k.type = 'WATERBEHOEFTE' AND k.waarde = 'HOOG')
+
+   -- Peterselie: zon/halfschaduw, gemiddeld water
+   OR (ps.nederlandse_naam = 'Peterselie' AND k.type = 'STANDPLAATS' AND k.waarde = 'HALFSCHADUW')
+   OR (ps.nederlandse_naam = 'Peterselie' AND k.type = 'WATERBEHOEFTE' AND k.waarde = 'GEMIDDELD')
+
+   -- Tijm: zon, laag water
+   OR (ps.nederlandse_naam = 'Tijm' AND k.type = 'STANDPLAATS' AND k.waarde = 'ZON')
+   OR (ps.nederlandse_naam = 'Tijm' AND k.type = 'WATERBEHOEFTE' AND k.waarde = 'LAAG')
+
+   -- Munt: halfschaduw, hoog water
+   OR (ps.nederlandse_naam = 'Munt' AND k.type = 'STANDPLAATS' AND k.waarde = 'HALFSCHADUW')
+   OR (ps.nederlandse_naam = 'Munt' AND k.type = 'WATERBEHOEFTE' AND k.waarde = 'HOOG')
+
+   -- Rozemarijn: zon, laag water
+   OR (ps.nederlandse_naam = 'Rozemarijn' AND k.type = 'STANDPLAATS' AND k.waarde = 'ZON')
+   OR (ps.nederlandse_naam = 'Rozemarijn' AND k.type = 'WATERBEHOEFTE' AND k.waarde = 'LAAG')
+
+   -- Salie: zon, laag water
+   OR (ps.nederlandse_naam = 'Salie' AND k.type = 'STANDPLAATS' AND k.waarde = 'ZON')
+   OR (ps.nederlandse_naam = 'Salie' AND k.type = 'WATERBEHOEFTE' AND k.waarde = 'LAAG')
+
+   -- Zomereik: zon/halfschaduw
+   OR (ps.nederlandse_naam = 'Zomereik' AND k.type = 'STANDPLAATS' AND k.waarde = 'ZON')
+
+   -- Ruwe berk: zon
+   OR (ps.nederlandse_naam = 'Ruwe berk' AND k.type = 'STANDPLAATS' AND k.waarde = 'ZON')
+
+   -- Beuk: halfschaduw / schaduw
+   OR (ps.nederlandse_naam = 'Beuk' AND k.type = 'STANDPLAATS' AND k.waarde = 'HALFSCHADUW')
+   OR (ps.nederlandse_naam = 'Beuk' AND k.type = 'STANDPLAATS' AND k.waarde = 'SCHADUW')
+
+   -- Noorse esdoorn: zon/halfschaduw
+   OR (ps.nederlandse_naam = 'Noorse esdoorn' AND k.type = 'STANDPLAATS' AND k.waarde = 'HALFSCHADUW')
+
+   -- Winterlinde: zon/halfschaduw, wit (bloesem)
+   OR (ps.nederlandse_naam = 'Winterlinde' AND k.type = 'BLOEMKLEUR' AND k.waarde = 'WIT')
+   OR (ps.nederlandse_naam = 'Winterlinde' AND k.type = 'STANDPLAATS' AND k.waarde = 'ZON')
+
+   -- Appelboom: wit (bloesem), zon/halfschaduw, gemiddeld water
+   OR (ps.nederlandse_naam = 'Appelboom' AND k.type = 'BLOEMKLEUR' AND k.waarde = 'WIT')
+   OR (ps.nederlandse_naam = 'Appelboom' AND k.type = 'STANDPLAATS' AND k.waarde = 'HALFSCHADUW')
+   OR (ps.nederlandse_naam = 'Appelboom' AND k.type = 'WATERBEHOEFTE' AND k.waarde = 'GEMIDDELD');
+
+-- =========================================
+-- 4) Foto’s (incl. hoofdfoto + extra foto’s)
+-- Belangrijk: per plant max 1 hoofdfoto (partial unique index)
+-- =========================================
+
+-- Lavendel: 1 hoofdfoto + 1 extra
+INSERT INTO foto (plant_soort_id, url, fotograaf, licentie, alt_tekst, hoofdfoto, bron)
+SELECT id, 'https://example.com/lavendel-1.jpg', 'Seed', 'CC-BY', 'Lavendel in bloei', TRUE, 'seed'
+FROM plant_soort WHERE nederlandse_naam = 'Lavendel';
+
+INSERT INTO foto (plant_soort_id, url, fotograaf, licentie, alt_tekst, hoofdfoto, bron)
+SELECT id, 'https://example.com/lavendel-2.jpg', 'Seed', 'CC-BY', 'Lavendel close-up', FALSE, 'seed'
+FROM plant_soort WHERE nederlandse_naam = 'Lavendel';
+
+-- Zonnebloem: 1 hoofdfoto
+INSERT INTO foto (plant_soort_id, url, fotograaf, licentie, alt_tekst, hoofdfoto, bron)
+SELECT id, 'https://example.com/zonnebloem-1.jpg', 'Seed', 'CC0', 'Zonnebloem in de zon', TRUE, 'seed'
+FROM plant_soort WHERE nederlandse_naam = 'Zonnebloem';
+
+-- Basilicum: 1 hoofdfoto + 1 extra
+INSERT INTO foto (plant_soort_id, url, fotograaf, licentie, alt_tekst, hoofdfoto, bron)
+SELECT id, 'https://example.com/basilicum-1.jpg', 'Seed', 'CC-BY', 'Basilicumplant', TRUE, 'seed'
+FROM plant_soort WHERE nederlandse_naam = 'Basilicum';
+
+INSERT INTO foto (plant_soort_id, url, fotograaf, licentie, alt_tekst, hoofdfoto, bron)
+SELECT id, 'https://example.com/basilicum-2.jpg', 'Seed', 'CC-BY', 'Basilicum bladeren', FALSE, 'seed'
+FROM plant_soort WHERE nederlandse_naam = 'Basilicum';
+
+-- Beuk: 1 foto (geen hoofdfoto) → test: plant met foto’s maar geen hoofdfoto
+INSERT INTO foto (plant_soort_id, url, fotograaf, licentie, alt_tekst, hoofdfoto, bron)
+SELECT id, 'https://example.com/beuk-1.jpg', 'Seed', 'CC-BY', 'Beuk blad', FALSE, 'seed'
+FROM plant_soort WHERE nederlandse_naam = 'Beuk';
+
+-- Let op: sommige planten houden we expres ZONDER foto voor testcases.
+
+-- =========================================
+-- 5) Synoniemen (handig voor toekomstige endpoints)
+-- =========================================
+INSERT INTO synoniem (plant_soort_id, naam)
+SELECT id, 'Echte lavendel' FROM plant_soort WHERE nederlandse_naam = 'Lavendel';
+
+INSERT INTO synoniem (plant_soort_id, naam)
+SELECT id, 'Zonnebloem (eenjarig)' FROM plant_soort WHERE nederlandse_naam = 'Zonnebloem';
+
+INSERT INTO synoniem (plant_soort_id, naam)
+SELECT id, 'Keukenbasilicum' FROM plant_soort WHERE nederlandse_naam = 'Basilicum';
+
+INSERT INTO synoniem (plant_soort_id, naam)
+SELECT id, 'Gewone narcis' FROM plant_soort WHERE nederlandse_naam = 'Narcis';
+
+INSERT INTO synoniem (plant_soort_id, naam)
+SELECT id, 'Appel (cultivar)' FROM plant_soort WHERE nederlandse_naam = 'Appelboom';
