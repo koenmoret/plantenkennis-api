@@ -3,9 +3,12 @@ package nl.novi.plantenkennis.controller;
 import jakarta.validation.Valid;
 import nl.novi.plantenkennis.dto.PlantSoortRequestDto;
 import nl.novi.plantenkennis.dto.PlantSoortResponseDto;
+import nl.novi.plantenkennis.dto.KenmerkResponseDto;
 import nl.novi.plantenkennis.entity.PlantSoort;
 import nl.novi.plantenkennis.mapper.PlantSoortMapper;
+import nl.novi.plantenkennis.mapper.KenmerkMapper;
 import nl.novi.plantenkennis.service.PlantSoortService;
+import nl.novi.plantenkennis.service.PlantKenmerkService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,9 +20,12 @@ import java.util.List;
 public class PlantSoortController {
 
     private final PlantSoortService service;
+    private final PlantKenmerkService plantKenmerkService;
 
-    public PlantSoortController(PlantSoortService service) {
+
+    public PlantSoortController(PlantSoortService service, PlantKenmerkService plantKenmerkService) {
         this.service = service;
+        this.plantKenmerkService = plantKenmerkService;
     }
 
     @GetMapping({"", "/"})
@@ -47,4 +53,26 @@ public class PlantSoortController {
                 .status(HttpStatus.CREATED)
                 .body(PlantSoortMapper.toResponse(created));
     }
+
+    @GetMapping("/{plantSoortId}/kenmerken")
+    public ResponseEntity<List<KenmerkResponseDto>> getKenmerken(@PathVariable Long plantSoortId) {
+        List<KenmerkResponseDto> response = plantKenmerkService.getByPlantSoort(plantSoortId).stream()
+                .map(pk -> KenmerkMapper.toResponse(pk.getKenmerk()))
+                .toList();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{plantSoortId}/kenmerken/{kenmerkId}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void addKenmerk(@PathVariable Long plantSoortId, @PathVariable Long kenmerkId) {
+        plantKenmerkService.addKenmerkToPlant(plantSoortId, kenmerkId);
+    }
+
+    @DeleteMapping("/{plantSoortId}/kenmerken/{kenmerkId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeKenmerk(@PathVariable Long plantSoortId, @PathVariable Long kenmerkId) {
+        plantKenmerkService.removeKenmerkFromPlant(plantSoortId, kenmerkId);
+    }
+
 }
