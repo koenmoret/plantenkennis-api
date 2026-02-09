@@ -13,4 +13,6 @@ public interface PlantKenmerkRepository extends JpaRepository<PlantKenmerk, Long
     Optional<PlantKenmerk> findByPlantSoortIdAndKenmerkId(Long plantSoortId, Long kenmerkId);
 
     List<PlantKenmerk> findByPlantSoortId(Long plantSoortId);
+
+    void deleteByPlantSoortIdAndKenmerkId(Long plantSoortId, Long kenmerkId);
 }
