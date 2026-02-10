@@ -9,6 +9,10 @@ import nl.novi.plantenkennis.mapper.PlantSoortMapper;
 import nl.novi.plantenkennis.mapper.KenmerkMapper;
 import nl.novi.plantenkennis.service.PlantSoortService;
 import nl.novi.plantenkennis.service.PlantKenmerkService;
+import nl.novi.plantenkennis.dto.SynoniemRequestDto;
+import nl.novi.plantenkennis.dto.SynoniemResponseDto;
+import nl.novi.plantenkennis.mapper.SynoniemMapper;
+import nl.novi.plantenkennis.service.SynoniemService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,11 +25,12 @@ public class PlantSoortController {
 
     private final PlantSoortService service;
     private final PlantKenmerkService plantKenmerkService;
+    private final SynoniemService synoniemService;
 
-
-    public PlantSoortController(PlantSoortService service, PlantKenmerkService plantKenmerkService) {
+    public PlantSoortController(PlantSoortService service, PlantKenmerkService plantKenmerkService, SynoniemService synoniemService) {
         this.service = service;
         this.plantKenmerkService = plantKenmerkService;
+        this.synoniemService = synoniemService;
     }
 
     @GetMapping({"", "/"})
@@ -75,4 +80,24 @@ public class PlantSoortController {
         plantKenmerkService.removeKenmerkFromPlant(plantSoortId, kenmerkId);
     }
 
+    @GetMapping("/{plantSoortId}/synoniemen")
+    public ResponseEntity<List<SynoniemResponseDto>> getSynoniemen(@PathVariable Long plantSoortId) {
+        List<SynoniemResponseDto> response = synoniemService.getByPlantSoort(plantSoortId).stream()
+                .map(SynoniemMapper::toResponse)
+                .toList();
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{plantSoortId}/synoniemen")
+    @ResponseStatus(HttpStatus.CREATED)
+    public SynoniemResponseDto addSynoniem(@PathVariable Long plantSoortId,
+                                           @Valid @RequestBody SynoniemRequestDto dto) {
+        return SynoniemMapper.toResponse(synoniemService.addToPlant(plantSoortId, dto.getNaam()));
+    }
+
+    @DeleteMapping("/{plantSoortId}/synoniemen/{synoniemId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeSynoniem(@PathVariable Long plantSoortId, @PathVariable Long synoniemId) {
+        synoniemService.removeFromPlant(plantSoortId, synoniemId);
+    }
 }
