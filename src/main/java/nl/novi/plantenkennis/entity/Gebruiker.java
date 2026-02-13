@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.time.LocalDateTime;
+
 
 @Entity
 @Table(name = "gebruikers")
@@ -19,6 +21,16 @@ public class Gebruiker {
 
     @Column(nullable = false, unique = true, length = 190)
     private String email;
+
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+    }
 
     /**
      * Let op: security komt pas in fase 3.
@@ -80,6 +92,14 @@ public class Gebruiker {
 
     public List<Spelsessie> getSpelsessies() {
         return spelsessies;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     // === equals/hashCode op id (JPA-safe) ===

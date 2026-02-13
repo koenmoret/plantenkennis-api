@@ -85,6 +85,53 @@ class PlantKenmerkServiceTest {
         verifyNoMoreInteractions(plantKenmerkRepository, plantSoortRepository, kenmerkRepository);
     }
 
+    // getKenmerkenVoorPlant() succespad
+    @DisplayName("getKenmerkenVoorPlant(): retourneert kenmerken wanneer plant bestaat")
+    @Test
+    void getKenmerkenVoorPlant_returnsKenmerken_whenPlantExists() {
+        // Arrange
+        Long plantId = 10L;
+
+        Kenmerk k1 = Kenmerk.builder().id(1L).type("BLOEMKLEUR").waarde("PAARS").build();
+        Kenmerk k2 = Kenmerk.builder().id(2L).type("STANDPLAATS").waarde("ZON").build();
+
+        when(plantSoortRepository.existsById(plantId)).thenReturn(true);
+        when(plantKenmerkRepository.findKenmerkenByPlantSoortId(plantId)).thenReturn(List.of(k1, k2));
+
+        // Act
+        List<Kenmerk> result = service.getKenmerkenVoorPlant(plantId);
+
+        // Assert
+        assertEquals(2, result.size());
+        assertEquals(1L, result.get(0).getId());
+        assertEquals(2L, result.get(1).getId());
+
+        verify(plantSoortRepository).existsById(plantId);
+        verify(plantKenmerkRepository).findKenmerkenByPlantSoortId(plantId);
+        verifyNoMoreInteractions(plantKenmerkRepository, plantSoortRepository, kenmerkRepository);
+    }
+
+    // getKenmerkenVoorPlant() plant ontbreekt
+    @DisplayName("getKenmerkenVoorPlant(): gooit ResourceNotFoundException wanneer plant niet bestaat")
+    @Test
+    void getKenmerkenVoorPlant_throws_whenPlantMissing() {
+        // Arrange
+        Long plantId = 404L;
+        when(plantSoortRepository.existsById(plantId)).thenReturn(false);
+
+        // Act + Assert
+        ResourceNotFoundException ex = assertThrows(
+                ResourceNotFoundException.class,
+                () -> service.getKenmerkenVoorPlant(plantId)
+        );
+
+        assertTrue(ex.getMessage().contains("PlantSoort niet gevonden"));
+
+        verify(plantSoortRepository).existsById(plantId);
+        verify(plantKenmerkRepository, never()).findKenmerkenByPlantSoortId(anyLong());
+        verifyNoMoreInteractions(plantKenmerkRepository, plantSoortRepository, kenmerkRepository);
+    }
+
     @DisplayName("addKenmerkToPlant(): slaat koppeling op wanneer plant en kenmerk bestaan en koppeling nog niet bestaat")
     @Test
     void addKenmerkToPlant_saves_whenNotExists() {
