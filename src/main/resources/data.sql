@@ -5,18 +5,18 @@
 -- =========================================
 -- 0) Opschonen (volgorde i.v.m. FK’s)
 -- =========================================
-DELETE FROM favoriet;
-DELETE FROM spelsessie;
+DELETE FROM favorieten;
+DELETE FROM spelsessies;
 DELETE FROM plantkenmerk;
 DELETE FROM foto;
 DELETE FROM synoniem;
-DELETE FROM kenmerk;
-DELETE FROM plant_soort;
+DELETE FROM kenmerken;
+DELETE FROM plant_soorten;
 
 -- =========================================
 -- 1) PlantSoorten (18 stuks)
 -- =========================================
-INSERT INTO plant_soort (
+INSERT INTO plant_soorten (
     wetenschappelijke_naam,
     nederlandse_naam,
     familie,
@@ -74,7 +74,7 @@ INSERT INTO plant_soort (
 -- =========================================
 -- 2) Kenmerken (herbruikbaar)
 -- =========================================
-INSERT INTO kenmerk (type, waarde) VALUES
+INSERT INTO kenmerken (type, waarde) VALUES
                                        ('BLOEMKLEUR', 'PAARS'),
                                        ('BLOEMKLEUR', 'GEEL'),
                                        ('BLOEMKLEUR', 'WIT'),
@@ -94,8 +94,8 @@ INSERT INTO kenmerk (type, waarde) VALUES
 -- =========================================
 INSERT INTO plantkenmerk (plant_soort_id, kenmerk_id)
 SELECT ps.id, k.id
-FROM plant_soort ps
-         JOIN kenmerk k ON 1=1
+FROM plant_soorten ps
+         JOIN kenmerken k ON 1=1
 WHERE
    -- Lavendel: paars, zon, laag water
     (ps.nederlandse_naam = 'Lavendel' AND k.type = 'BLOEMKLEUR' AND k.waarde = 'PAARS')
@@ -182,30 +182,30 @@ WHERE
 -- Lavendel: 1 hoofdfoto + 1 extra
 INSERT INTO foto (plant_soort_id, url, fotograaf, licentie, alt_tekst, hoofdfoto, bron)
 SELECT id, 'https://example.com/lavendel-1.jpg', 'Seed', 'CC-BY', 'Lavendel in bloei', TRUE, 'seed'
-FROM plant_soort WHERE nederlandse_naam = 'Lavendel';
+FROM plant_soorten WHERE nederlandse_naam = 'Lavendel';
 
 INSERT INTO foto (plant_soort_id, url, fotograaf, licentie, alt_tekst, hoofdfoto, bron)
 SELECT id, 'https://example.com/lavendel-2.jpg', 'Seed', 'CC-BY', 'Lavendel close-up', FALSE, 'seed'
-FROM plant_soort WHERE nederlandse_naam = 'Lavendel';
+FROM plant_soorten WHERE nederlandse_naam = 'Lavendel';
 
 -- Zonnebloem: 1 hoofdfoto
 INSERT INTO foto (plant_soort_id, url, fotograaf, licentie, alt_tekst, hoofdfoto, bron)
 SELECT id, 'https://example.com/zonnebloem-1.jpg', 'Seed', 'CC0', 'Zonnebloem in de zon', TRUE, 'seed'
-FROM plant_soort WHERE nederlandse_naam = 'Zonnebloem';
+FROM plant_soorten WHERE nederlandse_naam = 'Zonnebloem';
 
 -- Basilicum: 1 hoofdfoto + 1 extra
 INSERT INTO foto (plant_soort_id, url, fotograaf, licentie, alt_tekst, hoofdfoto, bron)
 SELECT id, 'https://example.com/basilicum-1.jpg', 'Seed', 'CC-BY', 'Basilicumplant', TRUE, 'seed'
-FROM plant_soort WHERE nederlandse_naam = 'Basilicum';
+FROM plant_soorten WHERE nederlandse_naam = 'Basilicum';
 
 INSERT INTO foto (plant_soort_id, url, fotograaf, licentie, alt_tekst, hoofdfoto, bron)
 SELECT id, 'https://example.com/basilicum-2.jpg', 'Seed', 'CC-BY', 'Basilicum bladeren', FALSE, 'seed'
-FROM plant_soort WHERE nederlandse_naam = 'Basilicum';
+FROM plant_soorten WHERE nederlandse_naam = 'Basilicum';
 
 -- Beuk: 1 foto (geen hoofdfoto) → test: plant met foto’s maar geen hoofdfoto
 INSERT INTO foto (plant_soort_id, url, fotograaf, licentie, alt_tekst, hoofdfoto, bron)
 SELECT id, 'https://example.com/beuk-1.jpg', 'Seed', 'CC-BY', 'Beuk blad', FALSE, 'seed'
-FROM plant_soort WHERE nederlandse_naam = 'Beuk';
+FROM plant_soorten WHERE nederlandse_naam = 'Beuk';
 
 -- Let op: sommige planten houden we expres ZONDER foto voor testcases.
 
@@ -213,16 +213,105 @@ FROM plant_soort WHERE nederlandse_naam = 'Beuk';
 -- 5) Synoniemen (handig voor toekomstige endpoints)
 -- =========================================
 INSERT INTO synoniem (plant_soort_id, naam)
-SELECT id, 'Echte lavendel' FROM plant_soort WHERE nederlandse_naam = 'Lavendel';
+SELECT id, 'Echte lavendel' FROM plant_soorten WHERE nederlandse_naam = 'Lavendel';
 
 INSERT INTO synoniem (plant_soort_id, naam)
-SELECT id, 'Zonnebloem (eenjarig)' FROM plant_soort WHERE nederlandse_naam = 'Zonnebloem';
+SELECT id, 'Zonnebloem (eenjarig)' FROM plant_soorten WHERE nederlandse_naam = 'Zonnebloem';
 
 INSERT INTO synoniem (plant_soort_id, naam)
-SELECT id, 'Keukenbasilicum' FROM plant_soort WHERE nederlandse_naam = 'Basilicum';
+SELECT id, 'Keukenbasilicum' FROM plant_soorten WHERE nederlandse_naam = 'Basilicum';
 
 INSERT INTO synoniem (plant_soort_id, naam)
-SELECT id, 'Gewone narcis' FROM plant_soort WHERE nederlandse_naam = 'Narcis';
+SELECT id, 'Gewone narcis' FROM plant_soorten WHERE nederlandse_naam = 'Narcis';
 
 INSERT INTO synoniem (plant_soort_id, naam)
-SELECT id, 'Appel (cultivar)' FROM plant_soort WHERE nederlandse_naam = 'Appelboom';
+SELECT id, 'Appel (cultivar)' FROM plant_soorten WHERE nederlandse_naam = 'Appelboom';
+
+
+-- =========================================
+-- 6) Gebruikers (voor spelsessies tests)
+-- =========================================
+INSERT INTO gebruikers (naam, email, wachtwoord_hash)
+VALUES
+    ('Koen Moret', 'koen@example.com', NULL),
+    ('Test Speler', 'speler@example.com', NULL);
+
+-- =========================================
+-- 7) Spelsessies (koppelen aan gebruikers)
+-- =========================================
+-- 3 sessies voor Koen
+INSERT INTO spelsessies (
+    gebruiker_id, modus, level, score, duur_sec, aantal_correct, aantal_pogingen, gespeeld_op
+)
+SELECT
+    g.id,
+    'TRAINING',
+    1,
+    120,
+    90,
+    8,
+    10,
+    NOW() - INTERVAL '2 days'
+FROM gebruikers g
+WHERE g.email = 'koen@example.com';
+
+INSERT INTO spelsessies (
+    gebruiker_id, modus, level, score, duur_sec, aantal_correct, aantal_pogingen, gespeeld_op
+)
+SELECT
+    g.id,
+    'TRAINING',
+    2,
+    180,
+    110,
+    12,
+    15,
+    NOW() - INTERVAL '1 day'
+FROM gebruikers g
+WHERE g.email = 'koen@example.com';
+
+INSERT INTO spelsessies (
+    gebruiker_id, modus, level, score, duur_sec, aantal_correct, aantal_pogingen, gespeeld_op
+)
+SELECT
+    g.id,
+    'EXAMEN',
+    3,
+    250,
+    140,
+    18,
+    20,
+    NOW() - INTERVAL '3 hours'
+FROM gebruikers g
+WHERE g.email = 'koen@example.com';
+
+-- 2 sessies voor Test Speler
+INSERT INTO spelsessies (
+    gebruiker_id, modus, level, score, duur_sec, aantal_correct, aantal_pogingen, gespeeld_op
+)
+SELECT
+    g.id,
+    'TRAINING',
+    1,
+    90,
+    75,
+    6,
+    12,
+    NOW() - INTERVAL '5 hours'
+FROM gebruikers g
+WHERE g.email = 'speler@example.com';
+
+INSERT INTO spelsessies (
+    gebruiker_id, modus, level, score, duur_sec, aantal_correct, aantal_pogingen, gespeeld_op
+)
+SELECT
+    g.id,
+    'EXAMEN',
+    2,
+    160,
+    105,
+    11,
+    14,
+    NOW() - INTERVAL '30 minutes'
+FROM gebruikers g
+WHERE g.email = 'speler@example.com';
