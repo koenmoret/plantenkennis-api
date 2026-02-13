@@ -19,7 +19,7 @@ public interface PlantKenmerkRepository extends JpaRepository<PlantKenmerk, Long
 
     void deleteByPlantSoortIdAndKenmerkId(Long plantSoortId, Long kenmerkId);
 
-    // ✅ NIEUW: haal direct de kenmerken op (geen proxies)
+    // haal direct de kenmerken op (geen proxies)
     @Query("""
            select k
            from PlantKenmerk pk

@@ -65,7 +65,5 @@ public class FavorietService {
 
         favorietRepository.delete(favoriet);
     }
-
-
 }
 

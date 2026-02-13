@@ -40,7 +40,7 @@ public class PlantSoortService {
         return repository.save(entity);
     }
 
-    // ===== nieuw: zoeken/filteren op plant_soorten kolommen =====
+    // ===== zoeken/filteren op plant_soorten kolommen =====
 
     public Page<PlantSoort> searchTableFields(
             String q,
