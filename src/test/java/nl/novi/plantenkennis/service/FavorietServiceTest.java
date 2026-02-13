@@ -1,8 +1,12 @@
 package nl.novi.plantenkennis.service;
 
 import nl.novi.plantenkennis.entity.Favoriet;
+import nl.novi.plantenkennis.entity.Gebruiker;
+import nl.novi.plantenkennis.entity.PlantSoort;
 import nl.novi.plantenkennis.exception.DuplicateResourceException;
 import nl.novi.plantenkennis.repository.FavorietRepository;
+import nl.novi.plantenkennis.repository.GebruikerRepository;
+import nl.novi.plantenkennis.repository.PlantSoortRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -19,83 +24,148 @@ import static org.mockito.Mockito.*;
 class FavorietServiceTest {
 
     @Mock
-    private FavorietRepository repository;
+    private FavorietRepository favorietRepository;
+
+    @Mock
+    private GebruikerRepository gebruikerRepository;
+
+    @Mock
+    private PlantSoortRepository plantSoortRepository;
 
     @InjectMocks
     private FavorietService service;
+
+    @DisplayName("getByGebruikerId() geeft lijst van favorieten terug")
+    @Test
+    void getByGebruikerId_returnsList() {
+        // Arrange
+        Long gebruikerId = 1L;
+
+        Gebruiker gebruiker = new Gebruiker();
+        // (id setten is vaak private; als je geen setter hebt, dan is dit genoeg voor deze test
+        // omdat we alleen list size checken en repository-call verifiëren)
+
+        Favoriet f1 = Favoriet.builder().id(1L).gebruiker(gebruiker).plantSoort(new PlantSoort()).build();
+        Favoriet f2 = Favoriet.builder().id(2L).gebruiker(gebruiker).plantSoort(new PlantSoort()).build();
+
+        when(favorietRepository.findByGebruiker_Id(gebruikerId)).thenReturn(List.of(f1, f2));
+
+        // Act
+        List<Favoriet> result = service.getByGebruikerId(gebruikerId);
+
+        // Assert
+        assertEquals(2, result.size());
+        verify(favorietRepository).findByGebruiker_Id(gebruikerId);
+    }
 
     @DisplayName("create() slaat favoriet op wanneer deze nog niet bestaat")
     @Test
     void create_savesFavoriet_whenNotDuplicate() {
         // Arrange
-        Favoriet input = Favoriet.builder()
-                .gebruikerId(1L)
-                .plantSoortId(2L)
-                .build();
+        Long gebruikerId = 1L;
+        Long plantSoortId = 2L;
 
-        when(repository.existsByGebruikerIdAndPlantSoortId(1L, 2L)).thenReturn(false);
+        when(favorietRepository.existsByGebruiker_IdAndPlantSoort_Id(gebruikerId, plantSoortId))
+                .thenReturn(false);
+
+        Gebruiker gebruiker = new Gebruiker();
+        PlantSoort plantSoort = new PlantSoort();
+
+        when(gebruikerRepository.findById(gebruikerId)).thenReturn(Optional.of(gebruiker));
+        when(plantSoortRepository.findById(plantSoortId)).thenReturn(Optional.of(plantSoort));
 
         Favoriet saved = Favoriet.builder()
                 .id(10L)
-                .gebruikerId(1L)
-                .plantSoortId(2L)
+                .gebruiker(gebruiker)
+                .plantSoort(plantSoort)
                 .build();
 
-        when(repository.save(input)).thenReturn(saved);
+        when(favorietRepository.save(any(Favoriet.class))).thenReturn(saved);
 
         // Act
-        Favoriet result = service.create(input);
+        Favoriet result = service.create(gebruikerId, plantSoortId);
 
         // Assert
         assertNotNull(result);
         assertEquals(10L, result.getId());
-        assertEquals(1L, result.getGebruikerId());
-        assertEquals(2L, result.getPlantSoortId());
 
-        verify(repository).existsByGebruikerIdAndPlantSoortId(1L, 2L);
-        verify(repository).save(input);
+        verify(favorietRepository).existsByGebruiker_IdAndPlantSoort_Id(gebruikerId, plantSoortId);
+        verify(gebruikerRepository).findById(gebruikerId);
+        verify(plantSoortRepository).findById(plantSoortId);
+
+        // Belangrijk: we saven een Favoriet met relaties, niet met losse ids
+        verify(favorietRepository).save(argThat(f ->
+                f.getGebruiker() == gebruiker && f.getPlantSoort() == plantSoort
+        ));
     }
 
     @DisplayName("create() gooit DuplicateResourceException wanneer favoriet al bestaat")
     @Test
     void create_throwsDuplicate_whenDuplicate() {
         // Arrange
-        Favoriet input = Favoriet.builder()
-                .gebruikerId(1L)
-                .plantSoortId(2L)
-                .build();
+        Long gebruikerId = 1L;
+        Long plantSoortId = 2L;
 
-        when(repository.existsByGebruikerIdAndPlantSoortId(1L, 2L)).thenReturn(true);
+        when(favorietRepository.existsByGebruiker_IdAndPlantSoort_Id(gebruikerId, plantSoortId))
+                .thenReturn(true);
 
         // Act + Assert
         DuplicateResourceException ex = assertThrows(
                 DuplicateResourceException.class,
-                () -> service.create(input)
+                () -> service.create(gebruikerId, plantSoortId)
         );
 
         assertTrue(ex.getMessage().toLowerCase().contains("favoriet bestaat al"));
 
-        verify(repository).existsByGebruikerIdAndPlantSoortId(1L, 2L);
-        verify(repository, never()).save(any(Favoriet.class));
+        verify(favorietRepository).existsByGebruiker_IdAndPlantSoort_Id(gebruikerId, plantSoortId);
+        verify(gebruikerRepository, never()).findById(anyLong());
+        verify(plantSoortRepository, never()).findById(anyLong());
+        verify(favorietRepository, never()).save(any());
     }
 
-    @DisplayName("getByGebruikerId() geeft lijst van favorieten terug")
+    @DisplayName("delete() verwijdert favoriet wanneer deze bestaat")
     @Test
-    void getByGebruikerId_returnsList() {
+    void delete_deletesFavoriet_whenExists() {
         // Arrange
-        Favoriet f1 = Favoriet.builder().id(1L).gebruikerId(1L).plantSoortId(10L).build();
-        Favoriet f2 = Favoriet.builder().id(2L).gebruikerId(1L).plantSoortId(11L).build();
+        Long gebruikerId = 1L;
+        Long plantSoortId = 2L;
 
-        when(repository.findByGebruikerId(1L)).thenReturn(List.of(f1, f2));
+        Favoriet favoriet = Favoriet.builder()
+                .id(99L)
+                .gebruiker(new Gebruiker())
+                .plantSoort(new PlantSoort())
+                .build();
+
+        when(favorietRepository.findByGebruiker_IdAndPlantSoort_Id(gebruikerId, plantSoortId))
+                .thenReturn(Optional.of(favoriet));
 
         // Act
-        List<Favoriet> result = service.getByGebruikerId(1L);
+        service.delete(gebruikerId, plantSoortId);
 
         // Assert
-        assertEquals(2, result.size());
-        assertEquals(10L, result.get(0).getPlantSoortId());
-        assertEquals(11L, result.get(1).getPlantSoortId());
+        verify(favorietRepository).findByGebruiker_IdAndPlantSoort_Id(gebruikerId, plantSoortId);
+        verify(favorietRepository).delete(favoriet);
+    }
 
-        verify(repository).findByGebruikerId(1L);
+    @DisplayName("delete() gooit RuntimeException wanneer favoriet niet bestaat")
+    @Test
+    void delete_throws_whenNotFound() {
+        // Arrange
+        Long gebruikerId = 1L;
+        Long plantSoortId = 2L;
+
+        when(favorietRepository.findByGebruiker_IdAndPlantSoort_Id(gebruikerId, plantSoortId))
+                .thenReturn(Optional.empty());
+
+        // Act + Assert
+        RuntimeException ex = assertThrows(
+                RuntimeException.class,
+                () -> service.delete(gebruikerId, plantSoortId)
+        );
+
+        assertTrue(ex.getMessage().toLowerCase().contains("favoriet niet gevonden"));
+
+        verify(favorietRepository).findByGebruiker_IdAndPlantSoort_Id(gebruikerId, plantSoortId);
+        verify(favorietRepository, never()).delete(any());
     }
 }

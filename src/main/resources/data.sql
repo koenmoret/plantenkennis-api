@@ -12,6 +12,7 @@ DELETE FROM foto;
 DELETE FROM synoniem;
 DELETE FROM kenmerken;
 DELETE FROM plant_soorten;
+DELETE FROM gebruikers;
 
 -- =========================================
 -- 1) PlantSoorten (18 stuks)
@@ -229,29 +230,24 @@ SELECT id, 'Appel (cultivar)' FROM plant_soorten WHERE nederlandse_naam = 'Appel
 
 
 -- =========================================
--- 6) Gebruikers (voor spelsessies tests)
+-- 6) Gebruikers (voor spelsessies & favorieten tests)
 -- =========================================
-INSERT INTO gebruikers (naam, email, wachtwoord_hash)
+INSERT INTO gebruikers (naam, email, wachtwoord_hash, created_at)
 VALUES
-    ('Koen Moret', 'koen@example.com', NULL),
-    ('Test Speler', 'speler@example.com', NULL);
+    ('Koen Moret', 'koen@example.com', NULL, NOW() - INTERVAL '10 days'),
+    ('Test Speler', 'speler@example.com', NULL, NOW() - INTERVAL '5 days'),
+    ('Gast Gebruiker', 'gast@example.com', NULL, NOW() - INTERVAL '1 day');
 
 -- =========================================
 -- 7) Spelsessies (koppelen aan gebruikers)
 -- =========================================
+
 -- 3 sessies voor Koen
 INSERT INTO spelsessies (
     gebruiker_id, modus, level, score, duur_sec, aantal_correct, aantal_pogingen, gespeeld_op
 )
 SELECT
-    g.id,
-    'TRAINING',
-    1,
-    120,
-    90,
-    8,
-    10,
-    NOW() - INTERVAL '2 days'
+    g.id, 'TRAINING', 1, 120, 90, 8, 10, NOW() - INTERVAL '2 days'
 FROM gebruikers g
 WHERE g.email = 'koen@example.com';
 
@@ -259,14 +255,7 @@ INSERT INTO spelsessies (
     gebruiker_id, modus, level, score, duur_sec, aantal_correct, aantal_pogingen, gespeeld_op
 )
 SELECT
-    g.id,
-    'TRAINING',
-    2,
-    180,
-    110,
-    12,
-    15,
-    NOW() - INTERVAL '1 day'
+    g.id, 'TRAINING', 2, 180, 110, 12, 15, NOW() - INTERVAL '1 day'
 FROM gebruikers g
 WHERE g.email = 'koen@example.com';
 
@@ -274,14 +263,7 @@ INSERT INTO spelsessies (
     gebruiker_id, modus, level, score, duur_sec, aantal_correct, aantal_pogingen, gespeeld_op
 )
 SELECT
-    g.id,
-    'EXAMEN',
-    3,
-    250,
-    140,
-    18,
-    20,
-    NOW() - INTERVAL '3 hours'
+    g.id, 'EXAMEN', 3, 250, 140, 18, 20, NOW() - INTERVAL '3 hours'
 FROM gebruikers g
 WHERE g.email = 'koen@example.com';
 
@@ -290,14 +272,7 @@ INSERT INTO spelsessies (
     gebruiker_id, modus, level, score, duur_sec, aantal_correct, aantal_pogingen, gespeeld_op
 )
 SELECT
-    g.id,
-    'TRAINING',
-    1,
-    90,
-    75,
-    6,
-    12,
-    NOW() - INTERVAL '5 hours'
+    g.id, 'TRAINING', 1, 90, 75, 6, 12, NOW() - INTERVAL '5 hours'
 FROM gebruikers g
 WHERE g.email = 'speler@example.com';
 
@@ -305,13 +280,52 @@ INSERT INTO spelsessies (
     gebruiker_id, modus, level, score, duur_sec, aantal_correct, aantal_pogingen, gespeeld_op
 )
 SELECT
-    g.id,
-    'EXAMEN',
-    2,
-    160,
-    105,
-    11,
-    14,
-    NOW() - INTERVAL '30 minutes'
+    g.id, 'EXAMEN', 2, 160, 105, 11, 14, NOW() - INTERVAL '30 minutes'
 FROM gebruikers g
 WHERE g.email = 'speler@example.com';
+
+-- 0 sessies voor Gast Gebruiker (bewust leeg voor testcases)
+
+-- =========================================
+-- 8) Favorieten (koppelen aan gebruiker + plantsoort)
+--    LET OP: plant_soort_id verwijst naar plant_soorten.id
+-- =========================================
+
+-- Koen: 2 favorieten
+INSERT INTO favorieten (gebruiker_id, plant_soort_id, aangemaakt_op)
+SELECT
+    g.id,
+    p.id,
+    NOW() - INTERVAL '4 days'
+FROM gebruikers g
+    JOIN plant_soorten p ON p.nederlandse_naam = 'Lavendel'
+WHERE g.email = 'koen@example.com';
+
+INSERT INTO favorieten (gebruiker_id, plant_soort_id, aangemaakt_op)
+SELECT
+    g.id,
+    p.id,
+    NOW() - INTERVAL '2 days'
+FROM gebruikers g
+    JOIN plant_soorten p ON p.nederlandse_naam = 'Beuk'
+WHERE g.email = 'koen@example.com';
+
+-- Test Speler: 1 favoriet
+INSERT INTO favorieten (gebruiker_id, plant_soort_id, aangemaakt_op)
+SELECT
+    g.id,
+    p.id,
+    NOW() - INTERVAL '1 day'
+FROM gebruikers g
+    JOIN plant_soorten p ON p.nederlandse_naam = 'Zonnebloem'
+WHERE g.email = 'speler@example.com';
+
+-- Gast: 1 favoriet
+INSERT INTO favorieten (gebruiker_id, plant_soort_id, aangemaakt_op)
+SELECT
+    g.id,
+    p.id,
+    NOW() - INTERVAL '12 hours'
+FROM gebruikers g
+    JOIN plant_soorten p ON p.nederlandse_naam = 'Tulp'
+WHERE g.email = 'gast@example.com';
