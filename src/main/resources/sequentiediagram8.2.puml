@@ -1,0 +1,65 @@
+@startuml
+title 8.2 Sequentiediagram – Memory-spelsessie afronden (POST /spelsessies)
+
+actor "Frontend (gebruiker)" as FE
+participant "SpelsessieController" as C
+participant "SpelsessieService" as S
+participant "GebruikerRepository" as GR
+participant "SpelsessieRepository" as SR
+database "Database (PostgreSQL)" as DB
+
+== Request ==
+FE -> C : POST /spelsessies\nBody: SpelsessieDto\n(modus, level, score, duurSec,\naantalCorrect, aantalPogingen, gebruikerId)
+activate C
+
+C -> S : createSpelsessie(dto)
+activate S
+
+note right of S
+Validatie:
+- dto != null
+- gebruikerId != null
+(endpoints gebruiken gebruikerId uit request)
+end note
+
+S -> GR : findById(gebruikerId)
+activate GR
+GR -> DB : SELECT gebruiker WHERE id = gebruikerId
+activate DB
+DB --> GR : Gebruiker (of geen)
+deactivate DB
+GR --> S : Optional<Gebruiker>
+deactivate GR
+
+alt Gebruiker gevonden
+  note right of S
+  Maak Spelsessie entity:
+  new Spelsessie(modus, level, score, duurSec,
+                 aantalCorrect, aantalPogingen)
+  - gespeeldOp wordt gezet via @PrePersist
+  - koppel gebruiker
+  end note
+
+  S -> SR : save(spelsessie)
+  activate SR
+  SR -> DB : INSERT INTO spelsessies (...)
+  activate DB
+  DB --> SR : opgeslagen rij + id
+  deactivate DB
+  SR --> S : Spelsessie (saved)
+  deactivate SR
+
+  S --> C : SpelsessieDto (mapped)
+  deactivate S
+
+  C --> FE : 201 Created\nBody: SpelsessieDto (id, gespeeldOp, ...)
+  deactivate C
+
+else Gebruiker niet gevonden
+  S --> C : IllegalArgumentException\n"Gebruiker niet gevonden"
+  deactivate S
+  C --> FE : 400 Bad Request / 500 (afhankelijk van exceptionhandler)
+  deactivate C
+end
+
+@enduml

@@ -1,0 +1,65 @@
+@startuml
+title 8.1 Sequentiediagram – Plantenoverzicht opvragen (met filters + paging)
+
+actor "Frontend (gastgebruiker)" as FE
+participant "PlantSoortController" as C
+participant "PlantSoortService" as S
+participant "PlantSoortRepository" as R
+database "Database (PostgreSQL)" as DB
+participant "PlantSoortMapper" as M
+
+== Request ==
+FE -> C : GET /plantsoorten/search\n?q={q}&familie={familie}&giftig={giftig}\n&inheems={inheems}&onderhoudsniveau={onderhoudsniveau}\n&slug={slug}&bloeimaand={bloeimaand}\n&page={page}&size={size}
+
+activate C
+
+C -> S : searchTableFields(q, familie, giftig, inheems,\nonderhoudsniveau, slug, bloeimaand,\nupdatedAfter=null, updatedBefore=null, pageable)
+
+activate S
+
+note right of S
+Service normaliseert input:
+- trim strings
+- onderhoudsniveau naar uppercase (indien gevuld)
+- parse LocalDateTime indien gebruikt (hier null)
+end note
+
+S -> R : searchTableFields(q, familie, giftig, inheems,\nonderhoudsniveau, slug, bloeimaand,\nupdatedAfter, updatedBefore, pageable)
+
+activate R
+
+note right of R
+JPQL query met optionele filters:
+(:param IS NULL OR ...)
+Resultaat is Page<PlantSoort>
+end note
+
+R -> DB : SELECT ... FROM plant_soorten\nWHERE (filters...) LIMIT/OFFSET
+activate DB
+DB --> R : Resultset + total count
+deactivate DB
+
+R --> S : Page<PlantSoort>
+deactivate R
+
+S --> C : Page<PlantSoort>
+deactivate S
+
+== Mapping ==
+C -> M : map(PlantSoort -> PlantSoortResponseDto)\nvoor elk element in Page.content
+activate M
+M --> C : Page<PlantSoortResponseDto>
+deactivate M
+
+== Response ==
+C --> FE : 200 OK\nPage<PlantSoortResponseDto> (JSON)\ncontent kan leeg zijn
+deactivate C
+
+note over FE,C
+Als er geen resultaten zijn:
+- 200 OK
+- content = []
+- totalElements = 0
+end note
+
+@enduml
