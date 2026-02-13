@@ -1,4 +1,4 @@
-package nl.novi.plantenkennis.model;
+package nl.novi.plantenkennis.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;

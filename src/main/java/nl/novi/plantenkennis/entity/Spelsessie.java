@@ -1,4 +1,4 @@
-package nl.novi.plantenkennis.model;
+package nl.novi.plantenkennis.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -14,25 +14,24 @@ public class Spelsessie {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 80)
     private String modus;
 
-    @Column(nullable = false)
-    private String level;
+    // schema.sql: level INTEGER
+    private Integer level;
 
-    @Column(nullable = false)
-    private int score;
+    private Integer score;
 
-    @Column(nullable = false)
-    private int duurSec;
+    @Column(name = "duur_sec")
+    private Integer duurSec;
 
-    @Column(nullable = false)
-    private int aantalCorrect;
+    @Column(name = "aantal_correct")
+    private Integer aantalCorrect;
 
-    @Column(nullable = false)
-    private int aantalPogingen;
+    @Column(name = "aantal_pogingen")
+    private Integer aantalPogingen;
 
-    @Column(nullable = false)
+    @Column(name = "gespeeld_op", nullable = false)
     private LocalDateTime gespeeldOp;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
@@ -41,9 +40,7 @@ public class Spelsessie {
     private Gebruiker gebruiker;
 
     // === Constructors ===
-    public Spelsessie() {}
-
-    public Spelsessie(String modus, String level, int score, int duurSec, int aantalCorrect, int aantalPogingen) {
+    public Spelsessie(String modus, Integer level, Integer score, Integer duurSec, Integer aantalCorrect, Integer aantalPogingen) {
         this.modus = modus;
         this.level = level;
         this.score = score;
@@ -53,6 +50,8 @@ public class Spelsessie {
         this.gespeeldOp = LocalDateTime.now();
     }
 
+    public Spelsessie() {}
+
     @PrePersist
     protected void onCreate() {
         if (gespeeldOp == null) {
@@ -61,73 +60,31 @@ public class Spelsessie {
     }
 
     // === Getters/Setters ===
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
 
-    public String getModus() {
-        return modus;
-    }
+    public String getModus() { return modus; }
+    public void setModus(String modus) { this.modus = modus; }
 
-    public void setModus(String modus) {
-        this.modus = modus;
-    }
+    public Integer getLevel() { return level; }
+    public void setLevel(Integer level) { this.level = level; }
 
-    public String getLevel() {
-        return level;
-    }
+    public Integer getScore() { return score; }
+    public void setScore(Integer score) { this.score = score; }
 
-    public void setLevel(String level) {
-        this.level = level;
-    }
+    public Integer getDuurSec() { return duurSec; }
+    public void setDuurSec(Integer duurSec) { this.duurSec = duurSec; }
 
-    public int getScore() {
-        return score;
-    }
+    public Integer getAantalCorrect() { return aantalCorrect; }
+    public void setAantalCorrect(Integer aantalCorrect) { this.aantalCorrect = aantalCorrect; }
 
-    public void setScore(int score) {
-        this.score = score;
-    }
+    public Integer getAantalPogingen() { return aantalPogingen; }
+    public void setAantalPogingen(Integer aantalPogingen) { this.aantalPogingen = aantalPogingen; }
 
-    public int getDuurSec() {
-        return duurSec;
-    }
+    public LocalDateTime getGespeeldOp() { return gespeeldOp; }
+    public void setGespeeldOp(LocalDateTime gespeeldOp) { this.gespeeldOp = gespeeldOp; }
 
-    public void setDuurSec(int duurSec) {
-        this.duurSec = duurSec;
-    }
-
-    public int getAantalCorrect() {
-        return aantalCorrect;
-    }
-
-    public void setAantalCorrect(int aantalCorrect) {
-        this.aantalCorrect = aantalCorrect;
-    }
-
-    public int getAantalPogingen() {
-        return aantalPogingen;
-    }
-
-    public void setAantalPogingen(int aantalPogingen) {
-        this.aantalPogingen = aantalPogingen;
-    }
-
-    public LocalDateTime getGespeeldOp() {
-        return gespeeldOp;
-    }
-
-    public void setGespeeldOp(LocalDateTime gespeeldOp) {
-        this.gespeeldOp = gespeeldOp;
-    }
-
-    public Gebruiker getGebruiker() {
-        return gebruiker;
-    }
-
-    public void setGebruiker(Gebruiker gebruiker) {
-        this.gebruiker = gebruiker;
-    }
+    public Gebruiker getGebruiker() { return gebruiker; }
+    public void setGebruiker(Gebruiker gebruiker) { this.gebruiker = gebruiker; }
 
     // === equals/hashCode op id ===
     @Override

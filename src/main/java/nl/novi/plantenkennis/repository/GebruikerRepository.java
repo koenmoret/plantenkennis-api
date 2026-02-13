@@ -1,6 +1,6 @@
 package nl.novi.plantenkennis.repository;
 
-import nl.novi.plantenkennis.model.Gebruiker;
+import nl.novi.plantenkennis.entity.Gebruiker;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
