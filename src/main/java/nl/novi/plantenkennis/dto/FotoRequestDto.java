@@ -8,7 +8,6 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class FotoRequestDto {
-    private String url;
     private String fotograaf;
     private String licentie;
     private String altTekst;

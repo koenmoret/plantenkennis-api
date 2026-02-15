@@ -18,12 +18,21 @@ DROP TABLE IF EXISTS gebruikers CASCADE;
 -- 1) Gebruikers (geen overerving in fase 2)
 -- =========================================
 CREATE TABLE gebruikers (
-                            id              BIGSERIAL PRIMARY KEY,
-                            naam            VARCHAR(120) NOT NULL,
-                            email           VARCHAR(255) NOT NULL UNIQUE,
-                            wachtwoord_hash VARCHAR(255),
-                            created_at      TIMESTAMP NOT NULL DEFAULT NOW()
+                            id                BIGSERIAL PRIMARY KEY,
+
+    -- ✅ Keycloak stable identifier (sub)
+                            keycloak_subject  VARCHAR(100) NOT NULL UNIQUE,
+
+                            naam              VARCHAR(120) NOT NULL,
+                            email             VARCHAR(190) NOT NULL UNIQUE,
+
+                            wachtwoord_hash   VARCHAR(255),
+                            created_at        TIMESTAMP NOT NULL DEFAULT NOW()
 );
+
+CREATE INDEX ix_gebruikers_keycloak_subject
+    ON gebruikers (keycloak_subject);
+
 
 -- =========================================
 -- 2) PlantSoorten
@@ -51,14 +60,24 @@ CREATE UNIQUE INDEX ux_plant_soorten_wetenschappelijke_naam
 -- 3) Foto (compositie bij PlantSoort)
 -- =========================================
 CREATE TABLE foto (
-                      id            BIGSERIAL PRIMARY KEY,
-                      plant_soort_id BIGINT NOT NULL,
-                      url           VARCHAR(1000) NOT NULL,
-                      fotograaf     VARCHAR(255),
-                      licentie      VARCHAR(255),
-                      alt_tekst     VARCHAR(255),
-                      hoofdfoto     BOOLEAN DEFAULT FALSE,
-                      bron          VARCHAR(255),
+                      id                BIGSERIAL PRIMARY KEY,
+                      plant_soort_id    BIGINT NOT NULL,
+                      url               VARCHAR(500) NOT NULL,
+
+    -- Opslag info filesystem
+                      storage_path      VARCHAR(500) NOT NULL,
+                      original_filename VARCHAR(255),
+                      content_type      VARCHAR(100),
+                      file_size         BIGINT,
+                      uploaded_at       TIMESTAMP NOT NULL DEFAULT NOW(),
+
+    -- Metadata
+                      fotograaf         VARCHAR(255),
+                      licentie          VARCHAR(255),
+                      alt_tekst         VARCHAR(255),
+                      hoofdfoto         BOOLEAN DEFAULT FALSE,
+                      bron              VARCHAR(255),
+
                       CONSTRAINT fk_foto_plant_soorten
                           FOREIGN KEY (plant_soort_id) REFERENCES plant_soorten(id)
                               ON DELETE CASCADE
@@ -71,6 +90,7 @@ CREATE INDEX ix_foto_plant_soort_id
 CREATE UNIQUE INDEX ux_foto_hoofdfoto_per_plant
     ON foto (plant_soort_id)
     WHERE hoofdfoto = TRUE;
+
 
 -- =========================================
 -- 4) Synoniem (compositie bij PlantSoort)

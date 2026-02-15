@@ -2,11 +2,11 @@ package nl.novi.plantenkennis.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.time.LocalDateTime;
-
 
 @Entity
 @Table(name = "gebruikers")
@@ -15,6 +15,9 @@ public class Gebruiker {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "keycloak_subject", nullable = false, unique = true, length = 100)
+    private String keycloakSubject;
 
     @Column(nullable = false, length = 120)
     private String naam;
@@ -25,6 +28,26 @@ public class Gebruiker {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(nullable = true, length = 255)
+    private String wachtwoordHash;
+
+    @OneToMany(mappedBy = "gebruiker",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Spelsessie> spelsessies = new ArrayList<>();
+
+    // ===== Constructors =====
+
+    public Gebruiker() {}
+
+    public Gebruiker(String keycloakSubject, String naam, String email) {
+        this.keycloakSubject = keycloakSubject;
+        this.naam = naam;
+        this.email = email;
+    }
+
     @PrePersist
     protected void onCreate() {
         if (createdAt == null) {
@@ -32,38 +55,18 @@ public class Gebruiker {
         }
     }
 
-    /**
-     * Let op: security komt pas in fase 3.
-     */
-    @Column(nullable = true, length = 255)
-    private String wachtwoordHash;
+    // ===== Getters / Setters =====
 
-    @OneToMany(mappedBy = "gebruiker", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<Spelsessie> spelsessies = new ArrayList<>();
-
-    // === Constructors ===
-    public Gebruiker() {}
-
-    public Gebruiker(String naam, String email) {
-        this.naam = naam;
-        this.email = email;
-    }
-
-    // === Helper methods (belangrijk voor consistente relaties) ===
-    public void addSpelsessie(Spelsessie spelsessie) {
-        spelsessies.add(spelsessie);
-        spelsessie.setGebruiker(this);
-    }
-
-    public void removeSpelsessie(Spelsessie spelsessie) {
-        spelsessies.remove(spelsessie);
-        spelsessie.setGebruiker(null);
-    }
-
-    // === Getters/Setters ===
     public Long getId() {
         return id;
+    }
+
+    public String getKeycloakSubject() {
+        return keycloakSubject;
+    }
+
+    public void setKeycloakSubject(String keycloakSubject) {
+        this.keycloakSubject = keycloakSubject;
     }
 
     public String getNaam() {
@@ -82,6 +85,10 @@ public class Gebruiker {
         this.email = email;
     }
 
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
     public String getWachtwoordHash() {
         return wachtwoordHash;
     }
@@ -94,15 +101,8 @@ public class Gebruiker {
         return spelsessies;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
+    // ===== equals/hashCode =====
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    // === equals/hashCode op id (JPA-safe) ===
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -1,6 +1,7 @@
 package nl.novi.plantenkennis.service;
 
 import nl.novi.plantenkennis.entity.PlantSoort;
+import nl.novi.plantenkennis.exception.ResourceNotFoundException;
 import nl.novi.plantenkennis.repository.PlantSoortRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +27,7 @@ public class PlantSoortService {
 
     public PlantSoort getById(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("PlantSoort niet gevonden met id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("PlantSoort niet gevonden met id: " + id));
     }
 
     public PlantSoort create(PlantSoort entity) {
