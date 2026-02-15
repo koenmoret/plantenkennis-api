@@ -1,0 +1,1931 @@
+{
+  "info": {
+    "_postman_id": "c3c2a291-61ca-42ef-9f1c-2d5e2447a95f",
+    "name": "Plantenkennis API",
+    "description": "Complete Postman collection voor PlantSoort, Kenmerk, PlantKenmerk-koppeling en Foto (en optioneel Synoniem/Health). Gebruik variabelen: baseUrl, plantSoortId, kenmerkId.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "32547774",
+    "_collection_link": "https://go.postman.co/collection/32547774-c3c2a291-61ca-42ef-9f1c-2d5e2447a95f?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "PlantSoorten",
+      "item": [
+        {
+          "name": "POST Create PlantSoort",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201/200', function () {",
+                  "  pm.expect([200,201]).to.include(pm.response.code);",
+                  "});",
+                  "",
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  if (json && json.id) {",
+                  "    pm.collectionVariables.set('plantSoortId', String(json.id));",
+                  "  }",
+                  "} catch (e) {}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "clientId",
+                  "value": "plantenkennis_portal",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "fNfnzB21YiPXrum5VH7pydNfY8ubZyRQ",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/token",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/auth",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code",
+                  "type": "string"
+                },
+                {
+                  "key": "tokenName",
+                  "value": "plantenkennis",
+                  "type": "string"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"wetenschappelijkeNaam\": \"Lavandula angustifolia\",\n  \"nederlandseNaam\": \"Lavendel\",\n  \"familie\": \"Lamiaceae\",\n  \"beschrijving\": \"Winterharde, geurende vaste plant.\",\n  \"bloeiperiodeStart\": 6,\n  \"bloeiperiodeEinde\": 8,\n  \"giftig\": false,\n  \"inheems\": false,\n  \"onderhoudsniveau\": \"laag\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/plantsoorten",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "plantsoorten"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET All PlantSoorten",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/plantsoorten",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "plantsoorten"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET PlantSoort by id",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/plantsoorten/{{plantSoortIdTulp}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "plantsoorten",
+                "{{plantSoortIdTulp}}"
+              ],
+              "query": [
+                {
+                  "key": "",
+                  "value": null,
+                  "type": "text",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search by name",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/plantsoorten/search?q={{plantName}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "plantsoorten",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "{{plantName}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "PlantKenmerken",
+      "item": [
+        {
+          "name": "POST Create Kenmerk",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201/200', function () {",
+                  "  pm.expect([200,201]).to.include(pm.response.code);",
+                  "});",
+                  "",
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  if (json && json.id) {",
+                  "    pm.collectionVariables.set('kenmerkId', String(json.id));",
+                  "  }",
+                  "} catch (e) {}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "clientId",
+                  "value": "plantenkennis_portal",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "fNfnzB21YiPXrum5VH7pydNfY8ubZyRQ",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/token",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/auth",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code",
+                  "type": "string"
+                },
+                {
+                  "key": "tokenName",
+                  "value": "plantenkennis",
+                  "type": "string"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"bloemkleur\",\n  \"waarde\": \"paars\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/kenmerken",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "kenmerken"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Link Kenmerk to PlantSoort",
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "clientId",
+                  "value": "plantenkennis_portal",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "fNfnzB21YiPXrum5VH7pydNfY8ubZyRQ",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/token",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/auth",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code",
+                  "type": "string"
+                },
+                {
+                  "key": "tokenName",
+                  "value": "plantenkennis",
+                  "type": "string"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/plantsoorten/{{plantSoortIdBeuk}}/kenmerken/{{kenmerkId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "plantsoorten",
+                "{{plantSoortIdBeuk}}",
+                "kenmerken",
+                "{{kenmerkId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Kenmerken for PlantSoort",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/plantsoorten/{{plantSoortIdBeuk}}/kenmerken",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "plantsoorten",
+                "{{plantSoortIdBeuk}}",
+                "kenmerken"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE Unlink Kenmerk from PlantSoort",
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "clientId",
+                  "value": "plantenkennis_portal",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "fNfnzB21YiPXrum5VH7pydNfY8ubZyRQ",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/token",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/auth",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code",
+                  "type": "string"
+                },
+                {
+                  "key": "tokenName",
+                  "value": "plantenkennis",
+                  "type": "string"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/plantsoorten/{{plantSoortIdBeuk}}/kenmerken/{{kenmerkId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "plantsoorten",
+                "{{plantSoortIdBeuk}}",
+                "kenmerken",
+                "{{kenmerkId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Foto's",
+      "item": [
+        {
+          "name": "POST Add Foto to PlantSoort",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201/200', function () {",
+                  "  pm.expect([200,201]).to.include(pm.response.code);",
+                  "});",
+                  "",
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  if (json && json.id) {",
+                  "    pm.collectionVariables.set('fotoId', String(json.id));",
+                  "  }",
+                  "} catch (e) {}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "clientId",
+                  "value": "plantenkennis_portal",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "fNfnzB21YiPXrum5VH7pydNfY8ubZyRQ",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/token",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/auth",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code",
+                  "type": "string"
+                },
+                {
+                  "key": "tokenName",
+                  "value": "plantenkennis",
+                  "type": "string"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "uuid": "c38c2497-2cb0-4e53-b29c-c81e2a95a782",
+                  "src": "/D:/Novi ICT/Leerjaar 4/Eindopdracht/plantenkennis-api/uploads/plantsoorten/beuk-2.jpg"
+                },
+                {
+                  "key": "altTekst",
+                  "value": "Beuk in bloei",
+                  "type": "text",
+                  "uuid": "43ee9a09-be25-4234-9e4c-25f6a5c45463"
+                },
+                {
+                  "key": "hoofdfoto",
+                  "value": "false",
+                  "type": "text",
+                  "uuid": "76abdf6b-a50b-41fe-ad7f-e999b31d903a"
+                },
+                {
+                  "key": "fotograaf",
+                  "value": "Koen Moret",
+                  "type": "text",
+                  "uuid": "3905122e-7b39-4b89-9745-0eb7c8e8e127"
+                },
+                {
+                  "key": "licentie",
+                  "value": "CC-BY",
+                  "type": "text",
+                  "uuid": "716f7473-725f-4e85-b699-ec1c5297f35c"
+                },
+                {
+                  "key": "bron",
+                  "value": "seed",
+                  "type": "text",
+                  "uuid": "e73d1e20-12e8-433b-9479-5753605c9885"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/plantsoorten/{{plantSoortId}}/fotos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "plantsoorten",
+                "{{plantSoortId}}",
+                "fotos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Foto's for PlantSoort",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/plantsoorten/{{plantSoortIdBeuk}}/fotos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "plantsoorten",
+                "{{plantSoortIdBeuk}}",
+                "fotos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE Foto by id",
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "clientId",
+                  "value": "plantenkennis_portal",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "fNfnzB21YiPXrum5VH7pydNfY8ubZyRQ",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/token",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/auth",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code",
+                  "type": "string"
+                },
+                {
+                  "key": "tokenName",
+                  "value": "plantenkennis",
+                  "type": "string"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/plantsoorten/{{plantSoortIdBeuk}}/fotos/{{lastFotoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "plantsoorten",
+                "{{plantSoortIdBeuk}}",
+                "fotos",
+                "{{lastFotoId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Synoniemen",
+      "item": [
+        {
+          "name": "POST Add Synoniem to PlantSoort",
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "clientId",
+                  "value": "plantenkennis_portal",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "fNfnzB21YiPXrum5VH7pydNfY8ubZyRQ",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/token",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/auth",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code",
+                  "type": "string"
+                },
+                {
+                  "key": "tokenName",
+                  "value": "plantenkennis",
+                  "type": "string"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"naam\": \"Groene beuk\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/plantsoorten/{{plantSoortIdBeuk}}/synoniemen",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "plantsoorten",
+                "{{plantSoortIdBeuk}}",
+                "synoniemen"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Synoniemen for PlantSoort",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/plantsoorten/{{plantSoortIdBeuk}}/synoniemen",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "plantsoorten",
+                "{{plantSoortIdBeuk}}",
+                "synoniemen"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE Synoniem",
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "clientId",
+                  "value": "plantenkennis_portal",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "fNfnzB21YiPXrum5VH7pydNfY8ubZyRQ",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/token",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/auth",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code",
+                  "type": "string"
+                },
+                {
+                  "key": "tokenName",
+                  "value": "plantenkennis",
+                  "type": "string"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/plantsoorten/{{plantSoortIdBeuk}}/synoniemen/{{synoniemId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "plantsoorten",
+                "{{plantSoortIdBeuk}}",
+                "synoniemen",
+                "{{synoniemId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Spelsessie",
+      "item": [
+        {
+          "name": "GET ALL Spelsessies",
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "clientId",
+                  "value": "plantenkennis_portal",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "fNfnzB21YiPXrum5VH7pydNfY8ubZyRQ",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/token",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/auth",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code",
+                  "type": "string"
+                },
+                {
+                  "key": "tokenName",
+                  "value": "plantenkennis",
+                  "type": "string"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/spelsessies",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "spelsessies"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET User Spelsessies",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/gebruikers/{{lastGebruikerId}}/spelsessies",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "gebruikers",
+                "{{lastGebruikerId}}",
+                "spelsessies"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST New Spelsessie",
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "clientId",
+                  "value": "plantenkennis_portal",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "fNfnzB21YiPXrum5VH7pydNfY8ubZyRQ",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/token",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/auth",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code",
+                  "type": "string"
+                },
+                {
+                  "key": "tokenName",
+                  "value": "plantenkennis",
+                  "type": "string"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"modus\": \"TRAINING\",\r\n  \"level\": 1,\r\n  \"score\": 120,\r\n  \"duurSec\": 90,\r\n  \"aantalCorrect\": 8,\r\n  \"aantalPogingen\": 10,\r\n  \"gebruikerId\": 2\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/spelsessies",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "spelsessies"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE Spelsessie by id",
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "clientId",
+                  "value": "plantenkennis_portal",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "fNfnzB21YiPXrum5VH7pydNfY8ubZyRQ",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/token",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/auth",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code",
+                  "type": "string"
+                },
+                {
+                  "key": "tokenName",
+                  "value": "plantenkennis",
+                  "type": "string"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/spelsessies/{{SpelsessieId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "spelsessies",
+                "{{SpelsessieId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Gebruikers",
+      "item": [
+        {
+          "name": "GET All Users",
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "clientId",
+                  "value": "plantenkennis_portal",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "fNfnzB21YiPXrum5VH7pydNfY8ubZyRQ",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/token",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/auth",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code",
+                  "type": "string"
+                },
+                {
+                  "key": "tokenName",
+                  "value": "plantenkennis",
+                  "type": "string"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/gebruikers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "gebruikers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET User by id",
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "clientId",
+                  "value": "plantenkennis_portal",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "fNfnzB21YiPXrum5VH7pydNfY8ubZyRQ",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/token",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/auth",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code",
+                  "type": "string"
+                },
+                {
+                  "key": "tokenName",
+                  "value": "plantenkennis",
+                  "type": "string"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/gebruikers/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "gebruikers",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE User by id",
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "clientId",
+                  "value": "plantenkennis_portal",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "fNfnzB21YiPXrum5VH7pydNfY8ubZyRQ",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/token",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/auth",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code",
+                  "type": "string"
+                },
+                {
+                  "key": "tokenName",
+                  "value": "plantenkennis",
+                  "type": "string"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/gebruikers/{{lastGebruikerId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "gebruikers",
+                "{{lastGebruikerId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT User by id",
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "clientId",
+                  "value": "plantenkennis_portal",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "fNfnzB21YiPXrum5VH7pydNfY8ubZyRQ",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/token",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/auth",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code",
+                  "type": "string"
+                },
+                {
+                  "key": "tokenName",
+                  "value": "plantenkennis",
+                  "type": "string"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n        \"id\": 3,\r\n        \"keycloakSubject\": \"dev-guest-001\",\r\n        \"naam\": \"Gast Gebruiker 2\",\r\n        \"email\": \"gast@example.com\",\r\n        \"createdAt\": \"2026-02-14T19:02:51.093143\",\r\n        \"aantalSpelsessies\": 0\r\n    }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/gebruikers/{{lastGebruikerId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "gebruikers",
+                "{{lastGebruikerId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Favorieten",
+      "item": [
+        {
+          "name": "GET Favoriet by userid",
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "clientId",
+                  "value": "plantenkennis_portal",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "fNfnzB21YiPXrum5VH7pydNfY8ubZyRQ",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/token",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/auth",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code",
+                  "type": "string"
+                },
+                {
+                  "key": "tokenName",
+                  "value": "plantenkennis",
+                  "type": "string"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/gebruikers/{{lastGebruikerId}}/favorieten",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "gebruikers",
+                "{{lastGebruikerId}}",
+                "favorieten"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Favoriet to user",
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "clientId",
+                  "value": "plantenkennis_portal",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "fNfnzB21YiPXrum5VH7pydNfY8ubZyRQ",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/token",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/auth",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code",
+                  "type": "string"
+                },
+                {
+                  "key": "tokenName",
+                  "value": "plantenkennis",
+                  "type": "string"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"plantSoortId\": 8\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/gebruikers/{{lastGebruikerId}}/favorieten",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "gebruikers",
+                "{{lastGebruikerId}}",
+                "favorieten"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE Favorietid by userid",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/gebruikers/{{lastGebruikerId}}/favorieten/{{lastPlantSoortId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "gebruikers",
+                "{{lastGebruikerId}}",
+                "favorieten",
+                "{{lastPlantSoortId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Security",
+      "item": [
+        {
+          "name": "200 zonder token",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "clientId",
+                  "value": "plantenkennis_portal",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "fNfnzB21YiPXrum5VH7pydNfY8ubZyRQ",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/token",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/auth",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code",
+                  "type": "string"
+                },
+                {
+                  "key": "tokenName",
+                  "value": "plantenkennis",
+                  "type": "string"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/public",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "public"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "401 zonder token, 200 met token",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "clientId",
+                  "value": "plantenkennis_portal",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "fNfnzB21YiPXrum5VH7pydNfY8ubZyRQ",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/token",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/auth",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code",
+                  "type": "string"
+                },
+                {
+                  "key": "tokenName",
+                  "value": "plantenkennis",
+                  "type": "string"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Role",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "clientId",
+                  "value": "plantenkennis_portal",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "fNfnzB21YiPXrum5VH7pydNfY8ubZyRQ",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/token",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "http://localhost:9090/realms/Plantenkennis/protocol/openid-connect/auth",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code",
+                  "type": "string"
+                },
+                {
+                  "key": "tokenName",
+                  "value": "plantenkennis",
+                  "type": "string"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/roles",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "roles"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "plantSoortIdLavendel",
+      "value": ""
+    },
+    {
+      "key": "plantSoortIdTulp",
+      "value": ""
+    },
+    {
+      "key": "plantSoortIdBeuk",
+      "value": ""
+    },
+    {
+      "key": "kenmerkId",
+      "value": ""
+    },
+    {
+      "key": "fotoId",
+      "value": ""
+    }
+  ]
+}

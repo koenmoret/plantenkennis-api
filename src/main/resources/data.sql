@@ -177,36 +177,143 @@ WHERE
 
 -- =========================================
 -- 4) Foto’s (incl. hoofdfoto + extra foto’s)
--- Belangrijk: per plant max 1 hoofdfoto (partial unique index)
+-- Let op: foto zelf staat niet in DB, alleen metadata + storage_path.
+-- storage_path: plantsoorten/<plantSoortId>/<filename>
+-- url: http://localhost:8080/uploads/plantsoorten/<plantSoortId>/<filename>
 -- =========================================
 
 -- Lavendel: 1 hoofdfoto + 1 extra
-INSERT INTO foto (plant_soort_id, url, fotograaf, licentie, alt_tekst, hoofdfoto, bron)
-SELECT id, 'https://example.com/lavendel-1.jpg', 'Seed', 'CC-BY', 'Lavendel in bloei', TRUE, 'seed'
-FROM plant_soorten WHERE nederlandse_naam = 'Lavendel';
+INSERT INTO foto (
+    plant_soort_id, url,
+    storage_path, original_filename, content_type, file_size, uploaded_at,
+    fotograaf, licentie, alt_tekst, hoofdfoto, bron
+)
+SELECT
+    ps.id,
+    'http://localhost:8080/uploads/plantsoorten/' || ps.id || '/lavendel-1.jpg',
+    'plantsoorten/' || ps.id || '/lavendel-1.jpg',
+    'lavendel-1.jpg',
+    'image/jpeg',
+    123456,
+    NOW() - INTERVAL '10 days',
+    'Seed',
+    'CC-BY',
+    'Lavendel in bloei',
+    TRUE,
+    'seed'
+FROM plant_soorten ps
+WHERE ps.nederlandse_naam = 'Lavendel';
 
-INSERT INTO foto (plant_soort_id, url, fotograaf, licentie, alt_tekst, hoofdfoto, bron)
-SELECT id, 'https://example.com/lavendel-2.jpg', 'Seed', 'CC-BY', 'Lavendel close-up', FALSE, 'seed'
-FROM plant_soorten WHERE nederlandse_naam = 'Lavendel';
+INSERT INTO foto (
+    plant_soort_id, url,
+    storage_path, original_filename, content_type, file_size, uploaded_at,
+    fotograaf, licentie, alt_tekst, hoofdfoto, bron
+)
+SELECT
+    ps.id,
+    'http://localhost:8080/uploads/plantsoorten/' || ps.id || '/lavendel-2.jpg',
+    'plantsoorten/' || ps.id || '/lavendel-2.jpg',
+    'lavendel-2.jpg',
+    'image/jpeg',
+    112233,
+    NOW() - INTERVAL '9 days',
+    'Seed',
+    'CC-BY',
+    'Lavendel close-up',
+    FALSE,
+    'seed'
+FROM plant_soorten ps
+WHERE ps.nederlandse_naam = 'Lavendel';
+
 
 -- Zonnebloem: 1 hoofdfoto
-INSERT INTO foto (plant_soort_id, url, fotograaf, licentie, alt_tekst, hoofdfoto, bron)
-SELECT id, 'https://example.com/zonnebloem-1.jpg', 'Seed', 'CC0', 'Zonnebloem in de zon', TRUE, 'seed'
-FROM plant_soorten WHERE nederlandse_naam = 'Zonnebloem';
+INSERT INTO foto (
+    plant_soort_id, url,
+    storage_path, original_filename, content_type, file_size, uploaded_at,
+    fotograaf, licentie, alt_tekst, hoofdfoto, bron
+)
+SELECT
+    ps.id,
+    'http://localhost:8080/uploads/plantsoorten/' || ps.id || '/zonnebloem-1.jpg',
+    'plantsoorten/' || ps.id || '/zonnebloem-1.jpg',
+    'zonnebloem-1.jpg',
+    'image/jpeg',
+    223344,
+    NOW() - INTERVAL '8 days',
+    'Seed',
+    'CC0',
+    'Zonnebloem in de zon',
+    TRUE,
+    'seed'
+FROM plant_soorten ps
+WHERE ps.nederlandse_naam = 'Zonnebloem';
+
 
 -- Basilicum: 1 hoofdfoto + 1 extra
-INSERT INTO foto (plant_soort_id, url, fotograaf, licentie, alt_tekst, hoofdfoto, bron)
-SELECT id, 'https://example.com/basilicum-1.jpg', 'Seed', 'CC-BY', 'Basilicumplant', TRUE, 'seed'
-FROM plant_soorten WHERE nederlandse_naam = 'Basilicum';
+INSERT INTO foto (
+    plant_soort_id, url,
+    storage_path, original_filename, content_type, file_size, uploaded_at,
+    fotograaf, licentie, alt_tekst, hoofdfoto, bron
+)
+SELECT
+    ps.id,
+    'http://localhost:8080/uploads/plantsoorten/' || ps.id || '/basilicum-1.jpg',
+    'plantsoorten/' || ps.id || '/basilicum-1.jpg',
+    'basilicum-1.jpg',
+    'image/jpeg',
+    99887,
+    NOW() - INTERVAL '7 days',
+    'Seed',
+    'CC-BY',
+    'Basilicumplant',
+    TRUE,
+    'seed'
+FROM plant_soorten ps
+WHERE ps.nederlandse_naam = 'Basilicum';
 
-INSERT INTO foto (plant_soort_id, url, fotograaf, licentie, alt_tekst, hoofdfoto, bron)
-SELECT id, 'https://example.com/basilicum-2.jpg', 'Seed', 'CC-BY', 'Basilicum bladeren', FALSE, 'seed'
-FROM plant_soorten WHERE nederlandse_naam = 'Basilicum';
+INSERT INTO foto (
+    plant_soort_id, url,
+    storage_path, original_filename, content_type, file_size, uploaded_at,
+    fotograaf, licentie, alt_tekst, hoofdfoto, bron
+)
+SELECT
+    ps.id,
+    'http://localhost:8080/uploads/plantsoorten/' || ps.id || '/basilicum-2.jpg',
+    'plantsoorten/' || ps.id || '/basilicum-2.jpg',
+    'basilicum-2.jpg',
+    'image/jpeg',
+    88776,
+    NOW() - INTERVAL '6 days',
+    'Seed',
+    'CC-BY',
+    'Basilicum bladeren',
+    FALSE,
+    'seed'
+FROM plant_soorten ps
+WHERE ps.nederlandse_naam = 'Basilicum';
+
 
 -- Beuk: 1 foto (geen hoofdfoto) → test: plant met foto’s maar geen hoofdfoto
-INSERT INTO foto (plant_soort_id, url, fotograaf, licentie, alt_tekst, hoofdfoto, bron)
-SELECT id, 'https://example.com/beuk-1.jpg', 'Seed', 'CC-BY', 'Beuk blad', FALSE, 'seed'
-FROM plant_soorten WHERE nederlandse_naam = 'Beuk';
+INSERT INTO foto (
+    plant_soort_id, url,
+    storage_path, original_filename, content_type, file_size, uploaded_at,
+    fotograaf, licentie, alt_tekst, hoofdfoto, bron
+)
+SELECT
+    ps.id,
+    'http://localhost:8080/uploads/plantsoorten/' || ps.id || '/beuk-1.jpg',
+    'plantsoorten/' || ps.id || '/beuk-1.jpg',
+    'beuk-1.jpg',
+    'image/jpeg',
+    445566,
+    NOW() - INTERVAL '5 days',
+    'Seed',
+    'CC-BY',
+    'Beuk blad',
+    FALSE,
+    'seed'
+FROM plant_soorten ps
+WHERE ps.nederlandse_naam = 'Beuk';
 
 -- Let op: sommige planten houden we expres ZONDER foto voor testcases.
 
@@ -232,11 +339,11 @@ SELECT id, 'Appel (cultivar)' FROM plant_soorten WHERE nederlandse_naam = 'Appel
 -- =========================================
 -- 6) Gebruikers (voor spelsessies & favorieten tests)
 -- =========================================
-INSERT INTO gebruikers (naam, email, wachtwoord_hash, created_at)
+INSERT INTO gebruikers (keycloak_subject, naam, email, wachtwoord_hash, created_at)
 VALUES
-    ('Koen Moret', 'koen@example.com', NULL, NOW() - INTERVAL '10 days'),
-    ('Test Speler', 'speler@example.com', NULL, NOW() - INTERVAL '5 days'),
-    ('Gast Gebruiker', 'gast@example.com', NULL, NOW() - INTERVAL '1 day');
+    ('dev-admin-001', 'beheerder1', 'beheerder@example.com', NULL, NOW() - INTERVAL '10 days'),
+    ('dev-user-001', 'deelnemer1', 'speler@example.com', NULL, NOW() - INTERVAL '5 days'),
+    ('dev-guest-001', 'Gast Gebruiker', 'gast@example.com', NULL, NOW() - INTERVAL '1 day');
 
 -- =========================================
 -- 7) Spelsessies (koppelen aan gebruikers)

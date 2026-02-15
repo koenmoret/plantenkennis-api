@@ -43,26 +43,50 @@ public class SecurityConfig {
                         // ===== PUBLIC =====
                         .requestMatchers("/auth/public").permitAll()
 
+                        // Publieke lees-endpoints
                         .requestMatchers(HttpMethod.GET, "/plantsoorten/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/kenmerken/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/foto/**").permitAll()
+
+                        // Foto's (metadata) bekijken publiek
+                        .requestMatchers(HttpMethod.GET, "/plantsoorten/*/fotos/**").permitAll()
+
+                        // ===== ADMIN endpoint  =====
+                        .requestMatchers("/auth/admin").hasAuthority("ROLE_client_admin")
 
                         // ===== AUTHENTICATED (ingelogd) =====
                         .requestMatchers("/auth/**").authenticated()
 
                         // ===== DEELNEMER =====
                         .requestMatchers(HttpMethod.GET, "/spelsessies/**").hasAuthority("ROLE_client_deelnemer")
-                        .requestMatchers(HttpMethod.GET, "/gebruikers/**").hasAuthority("ROLE_client_deelnemer")
 
-                        // ===== ADMIN =====
+                        // ===== GEBRUIKERS =====
+                        // ophalen: admin of deelnemer
+                        .requestMatchers(HttpMethod.GET, "/gebruikers/**")
+                        .hasAnyAuthority("ROLE_client_admin", "ROLE_client_deelnemer")
+
+                        // updaten: admin of deelnemer (service checkt: deelnemer alleen zichzelf)
+                        .requestMatchers(HttpMethod.PUT, "/gebruikers/**")
+                        .hasAnyAuthority("ROLE_client_admin", "ROLE_client_deelnemer")
+
+                        // verwijderen: alleen admin
+                        .requestMatchers(HttpMethod.DELETE, "/gebruikers/**")
+                        .hasAuthority("ROLE_client_admin")
+
+                        // ===== ADMIN: PLANTSOORTEN =====
                         .requestMatchers(HttpMethod.POST, "/plantsoorten/**").hasAuthority("ROLE_client_admin")
                         .requestMatchers(HttpMethod.PUT, "/plantsoorten/**").hasAuthority("ROLE_client_admin")
                         .requestMatchers(HttpMethod.DELETE, "/plantsoorten/**").hasAuthority("ROLE_client_admin")
 
+                        // ===== ADMIN: KENMERKEN =====
                         .requestMatchers(HttpMethod.POST, "/kenmerken/**").hasAuthority("ROLE_client_admin")
                         .requestMatchers(HttpMethod.DELETE, "/kenmerken/**").hasAuthority("ROLE_client_admin")
 
-                        // alles wat je niet expliciet toestaat: alleen ingelogd
+                        // ===== FOTO'S =====
+                        // Uploaden/verwijderen alleen admin
+                        .requestMatchers(HttpMethod.POST, "/plantsoorten/*/fotos").hasAuthority("ROLE_client_admin")
+                        .requestMatchers(HttpMethod.DELETE, "/plantsoorten/*/fotos/**").hasAuthority("ROLE_client_admin")
+
+                        // Alles wat je niet expliciet toestaat: alleen ingelogd
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
@@ -79,7 +103,7 @@ public class SecurityConfig {
 
     /**
      * Converter: haalt client-rollen uit:
-     * resource_access.<clientId>.
+     * resource_access.<clientId>.roles
      */
     @Bean
     public JwtAuthenticationConverter jwtAuthConverter() {
@@ -99,8 +123,9 @@ public class SecurityConfig {
         if (!(rolesObj instanceof Collection<?> roles)) return List.of();
 
         return roles.stream()
-                //ROLE_ wordt meegegeven in uit keycloak
                 .map(String::valueOf)
+                // Als Keycloak rollen zonder ROLE_ levert, zet dit aan:
+                // .map(r -> "ROLE_" + r)
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toSet());
     }
@@ -121,20 +146,16 @@ public class SecurityConfig {
         return decoder;
     }
 
-    record AudienceValidator(String audience)
-            implements OAuth2TokenValidator<Jwt> {
-
+    record AudienceValidator(String audience) implements OAuth2TokenValidator<Jwt> {
         @Override
         public OAuth2TokenValidatorResult validate(Jwt jwt) {
             Object audClaim = jwt.getClaims().get("aud");
 
             boolean ok = false;
-
             if (audClaim instanceof String audString) {
                 ok = audience.equals(audString);
             } else if (audClaim instanceof Collection<?> audList) {
-                ok = audList.stream()
-                        .anyMatch(a -> audience.equals(String.valueOf(a)));
+                ok = audList.stream().anyMatch(a -> audience.equals(String.valueOf(a)));
             }
 
             return ok
@@ -159,7 +180,7 @@ public class SecurityConfig {
               "error": "forbidden",
               "message": "Je hebt geen toegang tot deze resource."
             }
-        """);
+            """);
         };
     }
 }
